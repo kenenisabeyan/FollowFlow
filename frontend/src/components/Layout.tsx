@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Overdue: TechCorp Proposal', read: false },
+    { id: 2, title: 'Upcoming: Discovery Call', read: false }
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+    setNotifOpen(false);
+  };
 
   const navItems = [
     { to: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
@@ -96,12 +108,59 @@ export default function Layout() {
 
       {/* Main Panel */}
       <main className="flex-1 flex flex-col z-10 hero-gradient min-w-0">
-        <header className="h-16 glass flex items-center px-4 md:px-8 sticky top-0 z-30 justify-between md:justify-end">
+        <header className="h-16 glass flex items-center px-4 md:px-8 sticky top-0 z-30 justify-between">
            <button className="md:hidden text-gray-400 hover:text-white" onClick={() => setSidebarOpen(true)}>
              <Menu size={24} />
            </button>
-           <div className="text-sm text-gray-400 border border-white/10 px-3 py-1.5 rounded-full bg-surfaceLighter">
-             SaaS Production Mode
+           
+           <div className="ml-auto flex items-center gap-6">
+              {/* Notification System */}
+              <div className="relative">
+                <button 
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  className="relative p-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <Bell size={20} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {notifOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 glass rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+                    >
+                      <div className="p-4 border-b border-white/5 flex justify-between items-center">
+                        <h3 className="text-sm font-bold text-white">Notifications</h3>
+                        {unreadCount > 0 && (
+                          <button onClick={markAllRead} className="text-xs text-primary-400 hover:text-primary-300">
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-64 overflow-y-auto">
+                        {notifications.length > 0 ? notifications.map(n => (
+                          <div key={n.id} className={`p-4 border-b border-white/5 text-sm ${n.read ? 'opacity-60' : 'bg-white/5'}`}>
+                            <p className={`font-medium ${n.title.includes('Overdue') ? 'text-rose-400' : 'text-gray-200'}`}>
+                              {n.title}
+                            </p>
+                          </div>
+                        )) : (
+                          <div className="p-6 text-center text-gray-500 text-sm">No new alerts</div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="hidden md:block text-sm text-gray-400 border border-white/10 px-3 py-1.5 rounded-full bg-surfaceLighter">
+                SaaS Production Mode
+              </div>
            </div>
         </header>
 
