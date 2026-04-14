@@ -76,6 +76,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # If MySQL is required immediately, we need `mysqlclient` or `pymysql`. We will stick to sqlite for initial MVP building unless they have a MySQL instance. We'll use sqlite for now to ensure no DB errors block us, and they can change it later.
 import pymysql
 pymysql.install_as_MySQLdb()
+pymysql.version_info = (2, 2, 1, "final", 0)
 
 DATABASES = {
     'default': {
