@@ -1,16 +1,48 @@
-import React, { useState } from 'react';
-import { Search, MoreVertical, Edit2, Plus, Mail } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Edit2, Plus, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../api/client';
 
 export default function Customers() {
   const [showModal, setShowModal] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const mockCustomers = [
-    { id: 1, name: "Emma Watson", email: "emma@example.com", status: "Contacted", company: "Stark Ind" },
-    { id: 2, name: "Tony Smith", email: "tony@techcorp.com", status: "New", company: "TechCorp" },
-    { id: 3, name: "Sarah Connor", email: "sarah@cyberdyne.com", status: "Closed", company: "Cyberdyne" },
-    { id: 4, name: "Bruce Wayne", email: "bruce@wayne.enterprises", status: "Pending", company: "Wayne Ent" },
-  ];
+  // Form State
+  const [formData, setFormData] = useState({ company_name: '', contact_name: '', email: '' });
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  const fetchCustomers = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('customers/');
+      setCustomers(response.data);
+    } catch (error) {
+      console.error("API Error, utilizing fallback mockup metrics.", error);
+      // Failsafe for UI preview without MySQL DB launched yet
+      setCustomers([
+        { id: 1, contact_name: "Emma Watson", email: "emma@example.com", status: "Contacted", company_name: "Stark Ind" },
+        { id: 2, contact_name: "Tony Smith", email: "tony@techcorp.com", status: "New", company_name: "TechCorp" },
+        { id: 3, contact_name: "Bruce Wayne", email: "bruce@wayne.enterprises", status: "Pending", company_name: "Wayne Ent" },
+      ]);
+    }
+    setLoading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('customers/', formData);
+      setShowModal(false);
+      fetchCustomers(); // Refresh grid
+    } catch (error) {
+      alert("Error saving customer. Check your database connection.");
+      setShowModal(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -27,7 +59,7 @@ export default function Customers() {
           </div>
           <button 
             onClick={() => setShowModal(true)}
-            className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2"
+            className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-2 hover-lift"
           >
             <Plus size={16} /> Add 
           </button>
@@ -35,46 +67,50 @@ export default function Customers() {
       </div>
 
       <div className="glass rounded-2xl border border-white/5 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-400">
-            <thead className="bg-white/5 text-gray-300 uppercase text-xs font-semibold">
-              <tr>
-                <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Company</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {mockCustomers.map((c) => (
-                <tr key={c.id} className="hover:bg-white/5 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-surface border border-white/10 flex items-center justify-center text-xs font-bold text-gray-200">
-                        {c.name.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-200">{c.name}</div>
-                        <div className="text-xs text-gray-500">{c.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-300">{c.company}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status={c.status} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button className="text-gray-400 hover:text-white p-1 ml-2"><Mail size={16} /></button>
-                    <button className="text-gray-400 hover:text-primary-400 p-1 ml-2"><Edit2 size={16} /></button>
-                  </td>
+        <div className="overflow-x-auto min-h-[300px]">
+          {loading ? (
+             <div className="flex justify-center items-center h-48 text-primary-400">Loading Client Matrix...</div>
+          ) : (
+            <table className="w-full text-left text-sm text-gray-400">
+              <thead className="bg-white/5 text-gray-300 uppercase text-xs font-semibold">
+                <tr>
+                  <th className="px-6 py-4">Contact</th>
+                  <th className="px-6 py-4">Company</th>
+                  <th className="px-6 py-4">Dynamic Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {customers.map((c) => (
+                  <tr key={c.id} className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-surface border border-white/10 flex items-center justify-center text-xs font-bold text-gray-200">
+                          {c.contact_name?.charAt(0) || 'U'}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-200">{c.contact_name}</div>
+                          <div className="text-xs text-gray-500">{c.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-300 font-medium">{c.company_name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <StatusBadge status={c.status} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <button className="text-gray-400 hover:text-white p-1 ml-2 transition-colors"><Mail size={16} /></button>
+                      <button className="text-gray-400 hover:text-primary-400 p-1 ml-2 transition-colors"><Edit2 size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
-      {/* Basic Modal */}
+      {/* Add Modal Form Bound to Axios */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div 
@@ -82,21 +118,25 @@ export default function Customers() {
             animate={{ scale: 1, opacity: 1 }}
             className="glass w-full max-w-md rounded-2xl border border-white/10 p-6"
           >
-            <h2 className="text-xl font-bold text-white mb-4">Add Customer</h2>
-            <div className="space-y-4">
+            <h2 className="text-xl font-bold text-white mb-4">Add New Customer</h2>
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Full Name</label>
-                <input type="text" className="w-full bg-surfaceLighter border border-white/10 rounded-lg p-2.5 text-sm text-gray-200 focus:border-primary-500 outline-none" />
+                <label className="block text-xs font-medium text-gray-400 mb-1">Company Name</label>
+                <input required type="text" onChange={e => setFormData({...formData, company_name: e.target.value})} className="w-full bg-surfaceLighter border border-white/10 rounded-lg p-2.5 text-sm text-gray-200 focus:border-primary-500 outline-none" placeholder="Acme Corp" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Primary Contact Name</label>
+                <input required type="text" onChange={e => setFormData({...formData, contact_name: e.target.value})} className="w-full bg-surfaceLighter border border-white/10 rounded-lg p-2.5 text-sm text-gray-200 focus:border-primary-500 outline-none" placeholder="John Doe" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1">Email</label>
-                <input type="email" className="w-full bg-surfaceLighter border border-white/10 rounded-lg p-2.5 text-sm text-gray-200 focus:border-primary-500 outline-none" />
+                <input type="email" onChange={e => setFormData({...formData, email: e.target.value})} className="w-full bg-surfaceLighter border border-white/10 rounded-lg p-2.5 text-sm text-gray-200 focus:border-primary-500 outline-none" placeholder="john@acme.com" />
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-                <button className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium">Save Customer</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium">Save Customer</button>
               </div>
-            </div>
+            </form>
           </motion.div>
         </div>
       )}
