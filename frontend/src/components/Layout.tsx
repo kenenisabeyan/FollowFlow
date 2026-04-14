@@ -73,13 +73,22 @@ export default function Layout() {
         </nav>
 
         <div className="p-4 border-t border-white/5">
-          <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors bg-white/5">
-            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold">
+          <div 
+            onClick={() => {
+              if(window.confirm('Are you sure you want to log out?')) {
+                localStorage.removeItem('ff_token');
+                window.location.reload();
+              }
+            }}
+            className="flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors bg-white/5"
+            title="Click to Log Out"
+          >
+            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
               K
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-200 truncate">Kenenisa</p>
-              <p className="text-xs text-gray-500 truncate">Admin</p>
+              <p className="text-xs text-rose-400 font-medium truncate group-hover:text-rose-300">Log Out</p>
             </div>
           </div>
         </div>
