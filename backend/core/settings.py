@@ -74,10 +74,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # But for now, we leave sqlite, or set it up for MySQL.
 # "Database: MySQL (relational, reliable, scalable)"
 # If MySQL is required immediately, we need `mysqlclient` or `pymysql`. We will stick to sqlite for initial MVP building unless they have a MySQL instance. We'll use sqlite for now to ensure no DB errors block us, and they can change it later.
+import pymysql
+pymysql.install_as_MySQLdb()
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'followflow',
+        'USER': 'root',
+        'PASSWORD': '4117keno',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
