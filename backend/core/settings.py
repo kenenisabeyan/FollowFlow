@@ -69,25 +69,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database
-# For standard dev, we use sqlite. Production uses MySQL as requested.
-# But for now, we leave sqlite, or set it up for MySQL.
-# "Database: MySQL (relational, reliable, scalable)"
-# If MySQL is required immediately, we need `mysqlclient` or `pymysql`. We will stick to sqlite for initial MVP building unless they have a MySQL instance. We'll use sqlite for now to ensure no DB errors block us, and they can change it later.
-import pymysql
-pymysql.install_as_MySQLdb()
-pymysql.version_info = (2, 2, 1, "final", 0)
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'followflow',
-        'USER': 'root',
-        'PASSWORD': '4117keno',
-        'HOST': 'localhost',
-        'PORT': '3306',
+# Database configuration
+# Default to local SQLite for development so the frontend/backend communication
+# can be run immediately without requiring a MySQL server.
+if os.environ.get('FOLLOWFLOW_USE_SQLITE', '1') == '1':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+    pymysql.version_info = (2, 2, 1, 'final', 0)
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('FOLLOWFLOW_DB_NAME', 'followflow'),
+            'USER': os.environ.get('FOLLOWFLOW_DB_USER', 'root'),
+            'PASSWORD': os.environ.get('FOLLOWFLOW_DB_PASSWORD', ''),
+            'HOST': os.environ.get('FOLLOWFLOW_DB_HOST', 'localhost'),
+            'PORT': os.environ.get('FOLLOWFLOW_DB_PORT', '3306'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

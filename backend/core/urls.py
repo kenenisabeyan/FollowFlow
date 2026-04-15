@@ -1,15 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from customers.views import CustomerViewSet
 from tasks.views import TaskViewSet
 from notifications.views import NotificationViewSet
-from users.views import RegisterView, UserDetailView
+from users.views import RegisterView, UserDetailView, CustomTokenObtainPairView
 
 # Setup DRF Router
 router = DefaultRouter()
@@ -22,7 +19,7 @@ urlpatterns = [
 
     # Auth URLs
     path('api/auth/register/', RegisterView.as_view(), name='auth_register'),
-    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/me/', UserDetailView.as_view(), name='user_detail'),
 
