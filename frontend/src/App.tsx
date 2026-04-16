@@ -6,7 +6,9 @@ import Dashboard from './pages/Dashboard';
 import Customers from './pages/Customers';
 import Tasks from './pages/Tasks';
 import Timeline from './pages/Timeline';
+import Notifications from './pages/Notifications';
 import Login from './pages/Login';
+import Register from './pages/Register';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -29,10 +31,12 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="customers" element={<Customers />} />
             <Route path="tasks" element={<Tasks />} />
+            <Route path="notifications" element={<Notifications />} />
             <Route path="timeline" element={<Timeline />} />
           </Route>
         </Routes>

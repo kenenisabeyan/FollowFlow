@@ -36,7 +36,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not username and email:
             user = User.objects.filter(email__iexact=email).first()
             if user:
-                attrs[self.username_field] = user.username
+                attrs[self.username_field] = getattr(user, self.username_field)
 
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user).data

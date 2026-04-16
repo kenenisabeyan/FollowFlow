@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Bell, ArrowUpRight, ArrowDownRight, Clock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/client';
@@ -48,16 +49,32 @@ export default function Dashboard() {
     { title: 'Alerts', value: stats.notifications, up: stats.notifications === 0, pct: '0%' },
   ];
 
+  const { user } = useAuth();
+
   return (
     <div className="space-y-6">
+      <div className="rounded-3xl glass p-6 border border-white/10 shadow-lg shadow-black/10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-primary-300 font-semibold">Welcome back</p>
+            <h1 className="mt-2 text-3xl font-semibold text-white tracking-tight">
+              {user?.first_name ? `Hi, ${user.first_name}` : 'Hi there'}, ready for your dashboard?
+            </h1>
+            <p className="text-sm text-gray-400 mt-2 max-w-2xl">
+              Monitor your customers, tasks, and alerts in one place — refreshed live from the API.
+            </p>
+          </div>
+          <button className="self-start sm:self-center bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 hover-lift">
+            + New Follow-Up
+          </button>
+        </div>
+      </div>
+
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard Overview</h1>
+          <h2 className="text-2xl font-bold text-white tracking-tight">Overview</h2>
           <p className="text-sm text-gray-400 mt-1">Live customer, task, and alert metrics pulled from the API.</p>
         </div>
-        <button className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 hover-lift">
-          + New Follow-Up
-        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -1,32 +1,51 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/client';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const parseError = (err: any) => {
+    const data = err?.response?.data;
+    if (!data) return 'Invalid credentials, please try again.';
+    if (typeof data.detail === 'string') return data.detail;
+    if (typeof data === 'string') return data;
+    if (typeof data === 'object') {
+      return Object.entries(data)
+        .map(([key, value]) => {
+          const message = Array.isArray(value) ? value.join(' ') : value;
+          return `${key}: ${message}`;
+        })
+        .join(' ');
+    }
+    return 'Invalid credentials, please try again.';
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    try {
-      const response = await api.post('auth/login/', {
-        email,
-        password,
-      });
+    const payload: any = { password };
+    if (email.includes('@')) {
+      payload.email = email;
+    } else {
+      payload.username = email;
+    }
 
+    try {
+      const response = await api.post('auth/login/', payload);
       login(response.data.access, response.data.refresh, response.data.user);
       navigate('/');
     } catch (err: any) {
-      setError(
-        err?.response?.data?.detail || 'Invalid credentials, please try again.'
-      );
+      setError(parseError(err));
     }
   };
 
@@ -62,30 +81,37 @@ export default function Login() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">Email address</label>
+              <label className="block text-sm font-medium text-gray-300">Email or username</label>
               <div className="mt-1">
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-white/10 rounded-lg bg-surfaceLighter text-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
-                  placeholder="admin@followflow.com"
+                  placeholder="admin@followflow.com or username"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-300">Password</label>
-              <div className="mt-1">
+              <div className="mt-1 relative">
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-white/10 rounded-lg bg-surfaceLighter text-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
@@ -97,6 +123,12 @@ export default function Login() {
                 Sign in
               </button>
             </div>
+            <p className="text-center text-sm text-gray-400">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-primary-300 hover:text-primary-200">
+                Register
+              </Link>
+            </p>
           </form>
         </div>
       </motion.div>

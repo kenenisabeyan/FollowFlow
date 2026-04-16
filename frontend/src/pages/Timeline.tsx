@@ -1,46 +1,102 @@
-import React from 'react';
-import { Mail, PhoneCall, FileText, CheckCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Mail, PhoneCall, FileText, CheckCircle, Bell, Calendar } from 'lucide-react';
+import api from '../api/client';
 
 export default function Timeline() {
-  const activity = [
-    { id: 1, type: 'status', label: 'Stark Ind moved to Closed', time: '10 mins ago', user: 'Kenenisa', icon: <CheckCircle className="text-emerald-500" size={16}/> },
-    { id: 2, type: 'note', label: 'Meeting note added', desc: '"Client prefers strict SLA"', time: '2 hours ago', user: 'John', icon: <FileText className="text-blue-400" size={16}/> },
-    { id: 3, type: 'call', label: 'Discovery Call completed', desc: 'Duration: 45m', time: 'Yesterday', user: 'Kenenisa', icon: <PhoneCall className="text-purple-400" size={16}/> },
-    { id: 4, type: 'email', label: 'Proposal sent to Bruce', time: 'Oct 10', user: 'System', icon: <Mail className="text-gray-400" size={16}/> },
-  ];
+  const [activity, setActivity] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchActivity = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const [tasksRes, notificationsRes] = await Promise.all([
+          api.get('tasks/'),
+          api.get('notifications/'),
+        ]);
+
+        const taskEvents = tasksRes.data.map((task: any) => ({
+          id: `task-${task.id}`,
+          type: task.status === 'Completed' ? 'done' : 'task',
+          label: `${task.title} (${task.status})`,
+          desc: task.customer_detail?.company_name || task.customer,
+          time: new Date(task.due_date).toLocaleString(),
+          user: 'You',
+          icon: task.status === 'Completed' ? <CheckCircle className="text-emerald-500" size={16} /> : <Calendar className="text-blue-400" size={16} />,
+        }));
+
+        const notificationEvents = notificationsRes.data.map((note: any) => ({
+          id: `note-${note.id}`,
+          type: 'notification',
+          label: note.title,
+          desc: note.message,
+          time: new Date(note.created_at).toLocaleString(),
+          user: 'System',
+          icon: <Bell className="text-violet-400" size={16} />,
+        }));
+
+        const events = [...taskEvents, ...notificationEvents].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+        setActivity(events.slice(0, 8));
+      } catch (err) {
+        setError('Unable to load timeline events.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivity();
+  }, []);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <h1 className="text-2xl font-bold text-white tracking-tight">Global Activity Timeline</h1>
-      
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Global Activity Timeline</h1>
+          <p className="text-sm text-gray-400 mt-1">Live updates from tasks and notifications synced with your backend.</p>
+        </div>
+        <div className="text-xs uppercase tracking-[0.25em] text-gray-500">Data synced on every load</div>
+      </div>
+
+      {error && <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">{error}</div>}
+
       <div className="glass p-6 md:p-8 rounded-2xl border border-white/5 relative">
         <div className="absolute left-10 md:left-12 top-10 bottom-10 w-px bg-white/10" />
-        
-        <div className="space-y-8 relative z-10">
-          {activity.map((act) => (
-            <div key={act.id} className="flex gap-4 md:gap-6">
-              <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-white/20 flex items-center justify-center shrink-0 mt-1 shadow-lg">
-                {act.icon}
-              </div>
-              <div className="flex-1 bg-surfaceLighter/30 border border-white/5 p-4 rounded-xl">
-                <div className="flex justify-between items-start mb-1">
-                  <p className="text-sm font-medium text-gray-200">{act.label}</p>
-                  <span className="text-xs text-gray-500 whitespace-nowrap ml-4">{act.time}</span>
+
+        {loading ? (
+          <div className="h-56 flex items-center justify-center text-primary-400">Loading timeline...</div>
+        ) : (
+          <div className="space-y-8 relative z-10">
+            {activity.map((act) => (
+              <div key={act.id} className="flex gap-4 md:gap-6">
+                <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-white/20 flex items-center justify-center shrink-0 mt-1 shadow-lg">
+                  {act.icon}
                 </div>
-                {act.desc && <p className="text-sm text-gray-400 mt-2 bg-black/20 p-2.5 rounded border border-white/5">
-                  {act.desc}
-                </p>}
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[10px] text-white">
-                    {act.user.charAt(0)}
+                <div className="flex-1 bg-surfaceLighter/30 border border-white/5 p-4 rounded-xl">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-1">
+                    <p className="text-sm font-medium text-gray-200">{act.label}</p>
+                    <span className="text-xs text-gray-500 whitespace-nowrap">{act.time}</span>
                   </div>
-                   <span className="text-xs text-gray-500">by {act.user}</span>
+                  {act.desc && (
+                    <p className="text-sm text-gray-400 mt-2 bg-black/20 p-2.5 rounded border border-white/5">
+                      {act.desc}
+                    </p>
+                  )}
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center text-[10px] text-white">
+                      {act.user.charAt(0)}
+                    </div>
+                    <span className="text-xs text-gray-500">by {act.user}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+            {activity.length === 0 && <div className="text-gray-400 text-center py-12">No activity available yet.</div>}
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

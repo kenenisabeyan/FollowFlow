@@ -3,11 +3,13 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -41,6 +43,7 @@ export default function Layout() {
     { to: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { to: '/customers', icon: <Users size={20} />, label: 'Customers' },
     { to: '/tasks', icon: <CheckSquare size={20} />, label: 'Tasks', badge: '3' },
+    { to: '/notifications', icon: <Bell size={20} />, label: 'Notifications' },
     { to: '/timeline', icon: <Activity size={20} />, label: 'Timeline' },
   ];
 
@@ -104,24 +107,19 @@ export default function Layout() {
         </nav>
 
         <div className="p-4 border-t border-white/5">
-          <div 
-            onClick={() => {
-              if(window.confirm('Are you sure you want to log out?')) {
-                localStorage.removeItem('ff_token');
-                window.location.reload();
-              }
-            }}
-            className="flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-colors bg-white/5"
+          <button
+            onClick={() => logout()}
+            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors bg-white/5"
             title="Click to Log Out"
           >
             <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-              K
+              {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-200 truncate">Kenenisa</p>
-              <p className="text-xs text-rose-400 font-medium truncate group-hover:text-rose-300">Log Out</p>
+              <p className="text-sm font-medium text-gray-200 truncate">{user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username || 'User'}</p>
+              <p className="text-xs text-rose-400 font-medium truncate hover:text-rose-300">Log Out</p>
             </div>
-          </div>
+          </button>
         </div>
       </motion.aside>
 

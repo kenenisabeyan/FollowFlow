@@ -1,0 +1,8 @@
+{
+  "name": "followflow-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "venv\\Scripts\\python.exe manage.py runserver"
+  }
+}
