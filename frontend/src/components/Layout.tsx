@@ -2,20 +2,39 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../api/client';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Overdue: TechCorp Proposal', read: false },
-    { id: 2, title: 'Upcoming: Discovery Call', read: false }
-  ]);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const response = await api.get('notifications/');
+        setNotifications(response.data);
+      } catch (error) {
+        console.error('Failed loading notifications', error);
+      }
+    };
+    loadNotifications();
+  }, []);
 
-  const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-    setNotifOpen(false);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const markAllRead = async () => {
+    try {
+      await Promise.all(
+        notifications.map((notification) =>
+          api.patch(`notifications/${notification.id}/`, { is_read: true })
+        )
+      );
+      setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+      setNotifOpen(false);
+    } catch (error) {
+      console.error('Failed to mark notifications as read', error);
+    }
   };
 
   const navItems = [

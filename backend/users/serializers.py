@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -27,12 +27,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username = serializers.CharField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True, write_only=True)
+
     def validate(self, attrs):
-        if not attrs.get('username') and attrs.get('email'):
-            email = attrs.get('email')
+        username = attrs.get(self.username_field)
+        email = attrs.get('email')
+        if not username and email:
             user = User.objects.filter(email__iexact=email).first()
             if user:
-                attrs['username'] = user.username
+                attrs[self.username_field] = user.username
 
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user).data

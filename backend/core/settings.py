@@ -69,9 +69,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# Database configuration
-# Default to local SQLite for development so the frontend/backend communication
-# can be run immediately without requiring a MySQL server.
+# Database
+# Use SQLite locally by default for quick development.
+# Set FOLLOWFLOW_USE_SQLITE=0 to use MySQL instead.
 if os.environ.get('FOLLOWFLOW_USE_SQLITE', '1') == '1':
     DATABASES = {
         'default': {
