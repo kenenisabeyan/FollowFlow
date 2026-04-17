@@ -53,7 +53,7 @@ export default function Dashboard() {
     if (status === 'Contacted' || status === 'Completed' || status === 'In Progress') colors = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-xs';
     if (status === 'Overdue') colors = 'bg-rose-500/10 text-rose-500 border-rose-500/20 text-xs';
     
-    return <span className={`px-2 py-1 rounded inline-block border font-semibold ${colors}`}>{status}</span>;
+    return <span className={`px-2 py-1 rounded-lg inline-block border font-semibold ${colors}`}>{status}</span>;
   };
 
   const getRelativeTime = (dateStr: string) => {
@@ -86,10 +86,10 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
             key={stat.title}
-            className={`rounded-2xl p-6 relative overflow-hidden group hover-lift shadow-sm text-white bg-gradient-to-br ${stat.bgClass}`}
+            className={`rounded-full p-6 relative overflow-hidden group hover-lift shadow-sm text-white bg-gradient-to-br ${stat.bgClass}`}
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-            <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-full -mb-8 transition-transform group-hover:scale-110" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-lg-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+            <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-lg-full -mb-8 transition-transform group-hover:scale-110" />
             
             <h3 className="text-white/80 font-medium tracking-wide mb-1 text-sm md:text-base">{stat.title}</h3>
             <p className="text-4xl font-bold tracking-tight">{loading ? '—' : stat.value}</p>
@@ -140,7 +140,7 @@ export default function Dashboard() {
                Tasks
             </h2>
             <div className="flex gap-2">
-              <button onClick={() => alert('Task filtering features coming soon.')} className="px-2 py-1 text-xs rounded border border-borderMain hover:bg-surfaceLighter transition">Filter</button>
+              <button onClick={() => alert('Task filtering features coming soon.')} className="px-2 py-1 text-xs rounded-full border border-borderMain hover:bg-surfaceLighter transition">Filter</button>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -188,7 +188,7 @@ export default function Dashboard() {
              notifications.map(n => (
                <div key={n.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-surfaceLighter transition-colors">
                  <div className="flex items-center gap-4">
-                   <div className={`p-2 rounded-full ${n.title.toLowerCase().includes('overdue') || n.title.toLowerCase().includes('cancel') ? 'bg-rose-500/10 text-rose-500' : 'bg-primary-500/10 text-primary-500'}`}>
+                   <div className={`p-2 rounded-lg-full ${n.title.toLowerCase().includes('overdue') || n.title.toLowerCase().includes('cancel') ? 'bg-rose-500/10 text-rose-500' : 'bg-primary-500/10 text-primary-500'}`}>
                      {n.title.toLowerCase().includes('message') ? <MessageSquare size={18} /> : n.title.toLowerCase().includes('user') || n.title.toLowerCase().includes('customer') ? <UserPlus size={18}/> : <Info size={18} />}
                    </div>
                    <div>

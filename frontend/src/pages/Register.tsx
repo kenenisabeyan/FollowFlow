@@ -75,7 +75,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-600/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-600/20 rounded-lg-full blur-[100px] pointer-events-none" />
 
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -99,12 +99,12 @@ export default function Register() {
         <div className="bg-surface py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-borderMain">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">
+              <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">
                 {error}
               </div>
             )}
             {success && (
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
                 {success}
               </div>
             )}
@@ -116,7 +116,7 @@ export default function Register() {
                   required
                   value={formData.first_name}
                   onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                  className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                   placeholder="Kenenisa"
                 />
               </div>
@@ -126,7 +126,7 @@ export default function Register() {
                   required
                   value={formData.last_name}
                   onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                  className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                   placeholder="Abeyan"
                 />
               </div>
@@ -138,7 +138,7 @@ export default function Register() {
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                 placeholder="kenenisa"
               />
             </div>
@@ -150,7 +150,7 @@ export default function Register() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                 placeholder="you@example.com"
               />
             </div>
@@ -164,7 +164,7 @@ export default function Register() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                     placeholder="••••••••"
                   />
                   <button
@@ -184,7 +184,7 @@ export default function Register() {
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                     placeholder="••••••••"
                   />
                   <button
@@ -202,7 +202,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
                 {loading ? 'Registering...' : 'Create account'}
               </button>

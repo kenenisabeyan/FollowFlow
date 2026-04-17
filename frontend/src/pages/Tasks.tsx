@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '../api/client';
 
 export default function Tasks() {
@@ -7,9 +8,21 @@ export default function Tasks() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [formData, setFormData] = useState({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
 
   useEffect(() => {
     fetchTasks();
+    const fetchCustomers = async () => {
+      try {
+        const res = await api.get('customers/');
+        setCustomers(res.data);
+      } catch (err) {
+        console.error('Failed to load customers for dropdown', err);
+      }
+    };
+    fetchCustomers();
   }, []);
 
   const fetchTasks = async () => {
@@ -35,13 +48,32 @@ export default function Tasks() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.customer_id) return alert('Please select a customer.');
+    try {
+      await api.post('tasks/', {
+        title: formData.title,
+        description: formData.description,
+        due_date: formData.due_date,
+        priority: formData.priority,
+        customer: formData.customer_id
+      });
+      setShowModal(false);
+      setFormData({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
+      fetchTasks();
+    } catch (err) {
+      alert('Error creating task.');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     let colors = 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     if (status === 'Pending') colors = 'bg-blue-500/10 text-blue-500 border-blue-500/20';
     if (status === 'Completed') colors = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
     if (status === 'Overdue') colors = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
     
-    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border inline-block ${colors}`}>{status}</span>;
+    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-lg border inline-block ${colors}`}>{status}</span>;
   };
 
   const getPriorityBadge = (priority: string) => {
@@ -49,7 +81,7 @@ export default function Tasks() {
     if (priority === 'High') colors = 'bg-rose-500/10 text-rose-500';
     if (priority === 'Medium') colors = 'bg-amber-500/10 text-amber-500';
     if (priority === 'Low') colors = 'bg-blue-500/10 text-blue-500';
-    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded inline-block ${colors}`}>{priority}</span>;
+    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-lg inline-block ${colors}`}>{priority}</span>;
   };
 
   const filteredTasks = tasks.filter(t => 
@@ -65,12 +97,12 @@ export default function Tasks() {
           <p className="text-sm text-textMuted mt-1">Easily manage and track your follow-up workflows.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={fetchTasks} className="bg-surface border border-borderMain text-textMuted hover:text-textMain px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+          <button onClick={fetchTasks} className="bg-surface border border-borderMain text-textMuted hover:text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
             <RefreshCcw size={16} /> Refresh
           </button>
           <button 
-            onClick={() => alert('Task creation modal coming soon.')}
-            className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+            onClick={() => setShowModal(true)}
+            className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
           >
             <Plus size={16} /> New Task
           </button>
@@ -86,7 +118,7 @@ export default function Tasks() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 type="text"
                 placeholder="Search"
-                className="w-full bg-surfaceLighter border border-borderMain rounded-lg py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
+                className="w-full bg-surfaceLighter border border-borderMain rounded-full py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
                 />
             </div>
             <div className="text-sm font-medium text-textMuted">
@@ -94,7 +126,7 @@ export default function Tasks() {
             </div>
         </div>
 
-        {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 m-4 text-sm text-rose-500">{error}</div>}
+        {error && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-4 m-4 text-sm text-rose-500">{error}</div>}
 
         <div className="overflow-x-auto w-full">
             <table className="w-full text-left text-sm text-textMuted whitespace-nowrap">
@@ -121,7 +153,7 @@ export default function Tasks() {
                     </td>
                     <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded bg-primary-500/20 text-primary-600 flex items-center justify-center font-bold text-xs">
+                            <div className="w-6 h-6 rounded-full bg-primary-500/20 text-primary-600 flex items-center justify-center font-bold text-xs">
                                 {String(task.customer_detail?.company_name || task.customer || 'C').charAt(0).toUpperCase()}
                             </div>
                             <span className="font-medium text-textMain">{task.customer_detail?.company_name || String(task.customer) || 'Unknown Customer'}</span>
@@ -152,6 +184,92 @@ export default function Tasks() {
             </table>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface w-full max-w-md rounded-full border border-borderMain p-6 shadow-xl"
+          >
+            <h2 className="text-xl font-bold text-textMain mb-4">Add New Task</h2>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Task Title</label>
+                <input
+                  required
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  placeholder="Review contract"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Customer</label>
+                <select
+                  required
+                  value={formData.customer_id}
+                  onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                >
+                  <option value="">Select Customer</option>
+                  {customers.map(c => (
+                    <option key={c.id} value={c.id}>{c.contact_name} {c.company_name ? `(${c.company_name})` : ''}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Due Date</label>
+                <input
+                  required
+                  type="datetime-local"
+                  value={formData.due_date}
+                  onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Priority</label>
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  placeholder="Optional details"
+                  rows={2}
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 text-sm text-textMuted hover:text-textMain"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-full text-sm font-medium"
+                >
+                  Save Task
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

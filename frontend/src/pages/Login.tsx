@@ -51,7 +51,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-600/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-600/20 rounded-lg-full blur-[100px] pointer-events-none" />
 
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -75,7 +75,7 @@ export default function Login() {
         <div className="bg-surface py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-borderMain">
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
+              <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
                 {error}
               </div>
             )}
@@ -88,7 +88,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                   placeholder="admin@followflow.com or username"
                 />
               </div>
@@ -102,7 +102,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                   placeholder="••••••••"
                 />
                 <button
@@ -118,7 +118,7 @@ export default function Login() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
                 Sign in
               </button>

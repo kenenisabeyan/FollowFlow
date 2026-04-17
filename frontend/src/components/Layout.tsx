@@ -50,7 +50,7 @@ export default function Layout() {
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row relative overflow-hidden font-sans text-textMain">
+    <div className="h-screen bg-background flex flex-col md:flex-row relative overflow-hidden font-sans text-textMain">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div 
@@ -91,7 +91,7 @@ export default function Layout() {
               to={item.to}
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => 
-                `flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 group ${
+                `flex items-center justify-between px-3 py-2.5 rounded-full cursor-pointer transition-all duration-200 group ${
                   isActive ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400' : 'text-textMuted hover:bg-surfaceLighter hover:text-textMain'
                 }`
               }
@@ -101,7 +101,7 @@ export default function Layout() {
                 {item.label}
               </div>
               {item.badge && (
-                <span className="bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">
+                <span className="bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-lg-full shadow-sm">
                   {item.badge}
                 </span>
               )}
@@ -112,10 +112,10 @@ export default function Layout() {
         <div className="p-4 border-t border-borderMain">
           <button
             onClick={() => logout()}
-            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-xl hover:bg-surfaceLighter transition-colors"
+            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-full hover:bg-surfaceLighter transition-colors"
             title="Click to Log Out"
           >
-            <div className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
+            <div className="w-9 h-9 rounded-full-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
               {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0 mt-1">
@@ -128,7 +128,7 @@ export default function Layout() {
 
       {/* Main Panel */}
       <main className="flex-1 flex flex-col z-10 min-w-0">
-        <header className="h-16 bg-surface border-b border-borderMain flex items-center px-4 md:px-8 sticky top-0 z-30 justify-between">
+        <header className="shrink-0 h-16 bg-surface border-b border-borderMain flex items-center px-4 md:px-8 sticky top-0 z-30 justify-between">
            <button className="md:hidden text-textMuted hover:text-textMain" onClick={() => setSidebarOpen(true)}>
              <Menu size={24} />
            </button>
@@ -158,7 +158,7 @@ export default function Layout() {
                 >
                   <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-xl-full animate-pulse" />
                   )}
                 </button>
 
@@ -168,7 +168,7 @@ export default function Layout() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-80 bg-surface rounded-xl border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
+                      className="absolute right-0 mt-3 w-80 bg-surface rounded-full border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
                     >
                       <div className="p-4 border-b border-borderMain flex justify-between items-center">
                         <h3 className="text-sm font-bold">Notifications</h3>
@@ -195,7 +195,7 @@ export default function Layout() {
               </div>
 
               <div className="hidden md:flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center">
                   <span className="text-xs font-bold text-textMain">{user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}</span>
                 </div>
               </div>

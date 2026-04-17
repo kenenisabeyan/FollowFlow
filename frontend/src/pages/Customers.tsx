@@ -74,12 +74,12 @@ export default function Customers() {
               onChange={(e) => setSearchQuery(e.target.value)}
               type="text"
               placeholder="Search customers..."
-              className="w-full bg-surfaceLighter border border-borderMain rounded-lg py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
+              className="w-full bg-surfaceLighter border border-borderMain rounded-full py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
             />
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 hover-lift"
+            className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 hover-lift"
           >
             <Plus size={16} /> Add
           </button>
@@ -105,7 +105,7 @@ export default function Customers() {
                   <tr key={customer.id} className="hover:bg-surfaceLighter/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-xs font-bold text-textMain">
+                        <div className="w-8 h-8 rounded-full-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-xs font-bold text-textMain">
                           {String(customer.contact_name || customer.company_name || 'U').charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -135,7 +135,7 @@ export default function Customers() {
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
+            className="bg-surface w-full max-w-md rounded-full border border-borderMain p-6 shadow-xl"
           >
             <h2 className="text-xl font-bold text-textMain mb-4">Add New Customer</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -146,7 +146,7 @@ export default function Customers() {
                   type="text"
                   value={formData.company_name}
                   onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-lg p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                   placeholder="Acme Corp"
                 />
               </div>
@@ -157,7 +157,7 @@ export default function Customers() {
                   type="text"
                   value={formData.contact_name}
                   onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-lg p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                   placeholder="John Doe"
                 />
               </div>
@@ -167,7 +167,7 @@ export default function Customers() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-lg p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                   placeholder="john@acme.com"
                 />
               </div>
@@ -181,7 +181,7 @@ export default function Customers() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg text-sm font-medium"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-full text-sm font-medium"
                 >
                   Save Customer
                 </button>
@@ -202,7 +202,7 @@ function StatusBadge({ status }: { status: string }) {
     Closed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   };
   return (
-    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
+    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-lg inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
       {status || 'New'}
     </span>
   );
