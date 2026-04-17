@@ -86,10 +86,10 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
             key={stat.title}
-            className={`rounded-full p-6 relative overflow-hidden group hover-lift shadow-sm text-white bg-gradient-to-br ${stat.bgClass}`}
+            className={`rounded-2xl p-6 relative overflow-hidden group hover-lift shadow-sm text-white bg-gradient-to-br ${stat.bgClass}`}
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-lg-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-            <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-lg-full -mb-8 transition-transform group-hover:scale-110" />
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+            <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-full -mb-8 transition-transform group-hover:scale-110" />
             
             <h3 className="text-white/80 font-medium tracking-wide mb-1 text-sm md:text-base">{stat.title}</h3>
             <p className="text-4xl font-bold tracking-tight">{loading ? '—' : stat.value}</p>

@@ -158,7 +158,7 @@ export default function Layout() {
                 >
                   <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-xl-full animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
                   )}
                 </button>
 
@@ -168,7 +168,7 @@ export default function Layout() {
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-80 bg-surface rounded-full border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
+                      className="absolute right-0 mt-3 w-80 bg-surface rounded-2xl border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
                     >
                       <div className="p-4 border-b border-borderMain flex justify-between items-center">
                         <h3 className="text-sm font-bold">Notifications</h3>
@@ -195,7 +195,7 @@ export default function Layout() {
               </div>
 
               <div className="hidden md:flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center">
                   <span className="text-xs font-bold text-textMain">{user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}</span>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function Layout() {
         </header>
 
         <div className="flex-1 overflow-auto">
-           <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
+           <div className="p-4 md:p-8 w-full">
              <Outlet />
            </div>
         </div>
