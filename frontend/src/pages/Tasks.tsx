@@ -65,16 +65,19 @@ export default function Tasks() {
           <p className="text-sm text-textMuted mt-1">Easily manage and track your follow-up workflows.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={fetchTasks} className="glass text-textMuted hover:text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+          <button onClick={fetchTasks} className="bg-surface border border-borderMain text-textMuted hover:text-textMain px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
             <RefreshCcw size={16} /> Refresh
           </button>
-          <button className="bg-primary-600 hover:bg-primary-500 text-pureWhite px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 flex items-center gap-2">
+          <button 
+            onClick={() => alert('Task creation modal coming soon.')}
+            className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
+          >
             <Plus size={16} /> New Task
           </button>
         </div>
       </div>
 
-      <div className="glass rounded-2xl border border-borderMain overflow-hidden flex flex-col">
+      <div className="bg-surface rounded-2xl border border-borderMain overflow-hidden flex flex-col">
         <div className="p-4 border-b border-borderMain flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="relative flex-1 w-full max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
@@ -137,8 +140,8 @@ export default function Tasks() {
                             {task.status !== 'Completed' && (
                                 <button onClick={() => updateStatus(task, 'Completed')} className="p-1 hover:text-emerald-500" title="Mark Completed"><CheckCircle2 size={16}/></button>
                             )}
-                            <button className="p-1 hover:text-primary-500"><Edit2 size={16}/></button>
-                            <button className="p-1 hover:text-rose-500"><Trash2 size={16}/></button>
+                            <button onClick={() => alert('Task editing coming soon.')} className="p-1 hover:text-primary-500"><Edit2 size={16}/></button>
+                            <button onClick={() => alert('Task deletion coming soon.')} className="p-1 hover:text-rose-500"><Trash2 size={16}/></button>
                         </div>
                     </td>
                   </tr>

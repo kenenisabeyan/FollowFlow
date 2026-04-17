@@ -82,10 +82,10 @@ export default function Register() {
         animate={{ y: 0, opacity: 1 }}
         className="sm:mx-auto sm:w-full sm:max-w-md z-10"
       >
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-textMain tracking-tight">
           Create your FollowFlow account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-400">
+        <p className="mt-2 text-center text-sm text-textMuted">
           Securely register and start managing customers, tasks, and notifications.
         </p>
       </motion.div>
@@ -96,7 +96,7 @@ export default function Register() {
         transition={{ delay: 0.1 }}
         className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10"
       >
-        <div className="glass py-8 px-4 shadow sm:rounded-2xl sm:px-10 border border-white/5">
+        <div className="bg-surface py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-borderMain">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">
@@ -111,86 +111,86 @@ export default function Register() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-300">First name</label>
+                <label className="block text-sm font-medium text-textMuted">First name</label>
                 <input
                   required
                   value={formData.first_name}
                   onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                  className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                   placeholder="Kenenisa"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300">Last name</label>
+                <label className="block text-sm font-medium text-textMuted">Last name</label>
                 <input
                   required
                   value={formData.last_name}
                   onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                  className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                   placeholder="Abeyan"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">Username</label>
+              <label className="block text-sm font-medium text-textMuted">Username</label>
               <input
                 required
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                 placeholder="kenenisa"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">Email address</label>
+              <label className="block text-sm font-medium text-textMuted">Email address</label>
               <input
                 required
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                 placeholder="you@example.com"
               />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium text-gray-300">Password</label>
+                <label className="block text-sm font-medium text-textMuted">Password</label>
                 <div className="mt-1 relative">
                   <input
                     required
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300">Confirm password</label>
+                <label className="block text-sm font-medium text-textMuted">Confirm password</label>
                 <div className="mt-1 relative">
                   <input
                     required
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="mt-1 block w-full rounded-lg border border-white/10 bg-surfaceLighter px-3 py-2 text-sm text-white focus:border-primary-500 focus:outline-none"
+                    className="mt-1 block w-full rounded-lg border border-borderMain bg-surfaceLighter px-3 py-2 text-sm text-textMain focus:border-primary-500 focus:outline-none"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textMain"
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -202,15 +202,15 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-pureWhite bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
                 {loading ? 'Registering...' : 'Create account'}
               </button>
             </div>
 
-            <p className="text-center text-sm text-gray-400">
+            <p className="text-center text-sm text-textMuted">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary-300 hover:text-primary-200">
+              <Link to="/login" className="text-primary-500 hover:text-primary-600 font-medium">
                 Sign in
               </Link>
             </p>

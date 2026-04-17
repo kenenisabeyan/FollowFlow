@@ -4,6 +4,11 @@ from .models import Customer
 from .serializers import CustomerSerializer
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all().order_by('-created_at')
     serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Customer.objects.filter(owner=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

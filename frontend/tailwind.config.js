@@ -14,17 +14,9 @@ export default {
         background: 'var(--bg-background)',
         surface: 'var(--bg-surface)',
         surfaceLighter: 'var(--bg-surface-lighter)',
-        white: 'rgb(var(--color-white) / <alpha-value>)',
-        pureWhite: '#ffffff',
-        textMain: 'rgb(var(--color-white) / <alpha-value>)',
-        textMuted: 'rgb(var(--color-gray-400) / <alpha-value>)',
+        textMain: 'rgb(var(--color-text-main) / <alpha-value>)',
+        textMuted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         borderMain: 'var(--border-main)',
-        gray: {
-          200: 'rgb(var(--color-gray-200) / <alpha-value>)',
-          300: 'rgb(var(--color-gray-300) / <alpha-value>)',
-          400: 'rgb(var(--color-gray-400) / <alpha-value>)',
-          500: 'rgb(var(--color-gray-500) / <alpha-value>)',
-        },
         primary: {
           500: '#3B82F6',
           600: '#2563EB',
@@ -32,7 +24,7 @@ export default {
         brand: '#6366f1',
       },
       boxShadow: {
-        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+        'glass': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       }
     },
   },

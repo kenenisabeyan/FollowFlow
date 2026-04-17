@@ -86,7 +86,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
             key={stat.title}
-            className={`rounded-2xl p-6 relative overflow-hidden group hover-lift shadow-glass text-white bg-gradient-to-br ${stat.bgClass}`}
+            className={`rounded-2xl p-6 relative overflow-hidden group hover-lift shadow-sm text-white bg-gradient-to-br ${stat.bgClass}`}
           >
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
             <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-full -mb-8 transition-transform group-hover:scale-110" />
@@ -100,12 +100,12 @@ export default function Dashboard() {
       {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Customers Table */}
-        <div className="glass rounded-2xl flex flex-col border border-borderMain">
+        <div className="bg-surface rounded-2xl flex flex-col border border-borderMain">
           <div className="p-4 border-b border-borderMain flex items-center justify-between">
             <h2 className="text-lg font-semibold flex items-center gap-2 text-textMain">
                Customers
             </h2>
-            <button className="text-textMuted hover:text-textMain"><MoreHorizontal size={20}/></button>
+            <button onClick={() => alert('More options coming soon.')} className="text-textMuted hover:text-textMain"><MoreHorizontal size={20}/></button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-textMuted">
@@ -134,13 +134,13 @@ export default function Dashboard() {
         </div>
 
         {/* Tasks Table */}
-        <div className="glass rounded-2xl flex flex-col border border-borderMain">
+        <div className="bg-surface rounded-2xl flex flex-col border border-borderMain">
           <div className="p-4 border-b border-borderMain flex items-center justify-between">
             <h2 className="text-lg font-semibold flex items-center gap-2 text-textMain">
                Tasks
             </h2>
             <div className="flex gap-2">
-              <button className="px-2 py-1 text-xs rounded border border-borderMain hover:bg-surfaceLighter transition">Filter</button>
+              <button onClick={() => alert('Task filtering features coming soon.')} className="px-2 py-1 text-xs rounded border border-borderMain hover:bg-surfaceLighter transition">Filter</button>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -171,12 +171,12 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity */}
-      <div className="glass rounded-2xl border border-borderMain flex flex-col">
+      <div className="bg-surface rounded-2xl border border-borderMain flex flex-col">
         <div className="p-4 border-b border-borderMain flex items-center justify-between">
           <h2 className="text-lg font-semibold text-textMain">Recent Activity</h2>
           <div className="flex items-center gap-2">
             <span className="text-xs text-textMuted">Sort by:</span>
-            <button className="text-sm text-textMain font-medium flex items-center gap-1 hover:text-primary-500">
+            <button onClick={() => alert('Activity sorting coming soon.')} className="text-sm text-textMain font-medium flex items-center gap-1 hover:text-primary-500">
                Time <ArrowDownRight size={14}/>
             </button>
           </div>
