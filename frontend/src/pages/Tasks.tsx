@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus } from 'lucide-react';
+import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import api from '../api/client';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchTasks();
@@ -24,10 +25,9 @@ export default function Tasks() {
     }
   };
 
-  const updateStatus = async (task: any) => {
-    const nextStatus = task.status === 'Completed' ? 'Pending' : 'Completed';
+  const updateStatus = async (task: any, newStatus: string) => {
     try {
-      const response = await api.patch(`tasks/${task.id}/`, { status: nextStatus });
+      const response = await api.patch(`tasks/${task.id}/`, { status: newStatus });
       setTasks((current) => current.map((item) => (item.id === task.id ? response.data : item)));
     } catch (err) {
       setError('Could not update task status.');
@@ -35,70 +35,119 @@ export default function Tasks() {
     }
   };
 
-  const categories = [
-    { title: 'Pending', color: 'border-amber-500/30', data: tasks.filter((task) => task.status === 'Pending' || task.status === 'In Progress') },
-    { title: 'Overdue', color: 'border-rose-500/30', data: tasks.filter((task) => task.status === 'Overdue') },
-    { title: 'Completed', color: 'border-emerald-500/30', data: tasks.filter((task) => task.status === 'Completed') },
-  ];
+  const getStatusBadge = (status: string) => {
+    let colors = 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+    if (status === 'Pending') colors = 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+    if (status === 'Completed') colors = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+    if (status === 'Overdue') colors = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
+    
+    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border inline-block ${colors}`}>{status}</span>;
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    let colors = 'bg-gray-500/10 text-gray-500';
+    if (priority === 'High') colors = 'bg-rose-500/10 text-rose-500';
+    if (priority === 'Medium') colors = 'bg-amber-500/10 text-amber-500';
+    if (priority === 'Low') colors = 'bg-blue-500/10 text-blue-500';
+    return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded inline-block ${colors}`}>{priority}</span>;
+  };
+
+  const filteredTasks = tasks.filter(t => 
+    t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (t.customer_detail?.company_name || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Tasks & Follow-Ups</h1>
-          <p className="text-sm text-gray-400 mt-1">Track task status and update progress as work completes.</p>
+          <h1 className="text-2xl font-bold text-textMain tracking-tight">Tasks</h1>
+          <p className="text-sm text-textMuted mt-1">Easily manage and track your follow-up workflows.</p>
         </div>
-        <button onClick={fetchTasks} className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 flex items-center gap-2">
-          <RefreshCcw size={16} /> Refresh
-        </button>
+        <div className="flex gap-3">
+          <button onClick={fetchTasks} className="glass text-textMuted hover:text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+            <RefreshCcw size={16} /> Refresh
+          </button>
+          <button className="bg-primary-600 hover:bg-primary-500 text-pureWhite px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 flex items-center gap-2">
+            <Plus size={16} /> New Task
+          </button>
+        </div>
       </div>
 
-      {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">{error}</div>}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {categories.map((column) => (
-          <Column key={column.title} title={column.title} color={column.color} tasks={column.data} onUpdateStatus={updateStatus} loading={loading} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Column({ title, color, tasks, onUpdateStatus, loading }: { title: string; color: string; tasks: any[]; onUpdateStatus: (task: any) => void; loading: boolean; }) {
-  return (
-    <div className={`glass rounded-2xl p-5 border-t-4 ${color}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-gray-300">{title} ({tasks.length})</h2>
-      </div>
-      <div className="space-y-3">
-        {loading ? (
-          <div className="text-sm text-gray-400 text-center py-8">Loading tasks...</div>
-        ) : tasks.length > 0 ? (
-          tasks.map((task) => (
-            <div key={task.id} className="bg-surfaceLighter border border-white/5 p-4 rounded-xl hover:border-white/20 transition-colors">
-              <div className="flex items-start justify-between gap-3">
-                <div className="mt-0.5 shrink-0">
-                  {task.status === 'Completed' ? <CheckCircle2 size={16} className="text-emerald-400" /> : task.status === 'Overdue' ? <AlertCircle size={16} className="text-rose-400" /> : <Circle size={16} className="text-gray-500" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-medium ${task.status === 'Completed' ? 'text-gray-500 line-through' : 'text-gray-200'} truncate`}>{task.title}</p>
-                  <span className="text-xs text-primary-400 font-medium block mt-1">{task.customer_detail?.company_name || task.customer}</span>
-                  <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-500">
-                    <Calendar size={12} /> {new Date(task.due_date).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => onUpdateStatus(task)}
-                className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-200 hover:border-primary-500/40 transition-colors"
-              >
-                <Plus size={12} /> {task.status === 'Completed' ? 'Mark Pending' : 'Mark Complete'}
-              </button>
+      <div className="glass rounded-2xl border border-borderMain overflow-hidden flex flex-col">
+        <div className="p-4 border-b border-borderMain flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="relative flex-1 w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
+                <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text"
+                placeholder="Search"
+                className="w-full bg-surfaceLighter border border-borderMain rounded-lg py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
+                />
             </div>
-          ))
-        ) : (
-          <div className="text-sm text-gray-500 text-center py-4">No tasks in this category.</div>
-        )}
+            <div className="text-sm font-medium text-textMuted">
+              Total {filteredTasks.length} tasks
+            </div>
+        </div>
+
+        {error && <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 m-4 text-sm text-rose-500">{error}</div>}
+
+        <div className="overflow-x-auto w-full">
+            <table className="w-full text-left text-sm text-textMuted whitespace-nowrap">
+              <thead className="text-xs bg-surfaceLighter text-textMuted uppercase border-b border-borderMain">
+                <tr>
+                  <th className="px-6 py-4 font-semibold w-12">
+                    <input type="checkbox" className="rounded border-borderMain bg-surfaceLighter" />
+                  </th>
+                  <th className="px-6 py-4 font-semibold">Customer</th>
+                  <th className="px-6 py-4 font-semibold">Task</th>
+                  <th className="px-6 py-4 font-semibold">Due Date</th>
+                  <th className="px-6 py-4 font-semibold">Priority</th>
+                  <th className="px-6 py-4 font-semibold">Status</th>
+                  <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-borderMain bg-surface">
+                {loading ? (
+                    <tr><td colSpan={7} className="px-6 py-12 text-center">Loading tasks data...</td></tr>
+                ) : filteredTasks.length > 0 ? filteredTasks.map((task) => (
+                  <tr key={task.id} className="hover:bg-surfaceLighter/50 transition-colors group">
+                    <td className="px-6 py-4">
+                        <input type="checkbox" className="rounded border-borderMain bg-surfaceLighter focus:ring-primary-500" />
+                    </td>
+                    <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded bg-primary-500/20 text-primary-600 flex items-center justify-center font-bold text-xs">
+                                {String(task.customer_detail?.company_name || task.customer || 'C').charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-medium text-textMain">{task.customer_detail?.company_name || String(task.customer) || 'Unknown Customer'}</span>
+                        </div>
+                    </td>
+                    <td className="px-6 py-4 text-textMain">{task.title}</td>
+                    <td className="px-6 py-4">{new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                    <td className="px-6 py-4">
+                      {getPriorityBadge(task.priority)}
+                    </td>
+                    <td className="px-6 py-4">
+                        {getStatusBadge(task.status)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2 text-textMuted">
+                            {task.status !== 'Completed' && (
+                                <button onClick={() => updateStatus(task, 'Completed')} className="p-1 hover:text-emerald-500" title="Mark Completed"><CheckCircle2 size={16}/></button>
+                            )}
+                            <button className="p-1 hover:text-primary-500"><Edit2 size={16}/></button>
+                            <button className="p-1 hover:text-rose-500"><Trash2 size={16}/></button>
+                        </div>
+                    </td>
+                  </tr>
+                )) : (
+                    <tr><td colSpan={7} className="px-6 py-12 text-center text-textMuted">No tasks found. Try altering your search or create one.</td></tr>
+                )}
+              </tbody>
+            </table>
+        </div>
       </div>
     </div>
   );

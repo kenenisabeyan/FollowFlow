@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Bell, ArrowUpRight, ArrowDownRight, Clock, CheckCircle } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, UserPlus, Clock, BookOpen, User, Phone, CheckCircle2, AlertCircle, Circle, Bell, MoreHorizontal, MessageSquare, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/client';
 
@@ -12,7 +12,10 @@ export default function Dashboard() {
     notifications: 0,
   });
   const [tasks, setTasks] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -27,142 +30,182 @@ export default function Dashboard() {
         const tasksData = tasksRes.data;
         setStats({
           customers: customersRes.data.length,
-          tasks: tasksData.length,
-          completedTasks: tasksData.filter((task: any) => task.status === 'Completed').length,
+          tasks: tasksData.filter((t: any) => t.status !== 'Completed').length,
+          completedTasks: tasksData.filter((t: any) => t.status === 'Completed').length,
           notifications: notificationsRes.data.length,
         });
+
         setTasks(tasksData.slice(0, 4));
+        setCustomers(customersRes.data.slice(0, 4));
+        setNotifications(notificationsRes.data.slice(0, 5));
       } catch (error) {
         console.error('Failed loading dashboard metrics', error);
       } finally {
         setLoading(false);
       }
     };
-
     loadDashboard();
   }, []);
 
-  const summary = [
-    { title: 'Customers', value: stats.customers, up: true, pct: '8%' },
-    { title: 'Open Tasks', value: stats.tasks, up: stats.tasks > 0, pct: '5%' },
-    { title: 'Completed', value: stats.completedTasks, up: true, pct: '12%' },
-    { title: 'Alerts', value: stats.notifications, up: stats.notifications === 0, pct: '0%' },
-  ];
+  const getStatusBadge = (status: string) => {
+    let colors = 'bg-gray-500/10 text-gray-400';
+    if (status === 'New' || status === 'Pending') colors = 'bg-amber-500/10 text-amber-500 border-amber-500/20 text-xs';
+    if (status === 'Contacted' || status === 'Completed' || status === 'In Progress') colors = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-xs';
+    if (status === 'Overdue') colors = 'bg-rose-500/10 text-rose-500 border-rose-500/20 text-xs';
+    
+    return <span className={`px-2 py-1 rounded inline-block border font-semibold ${colors}`}>{status}</span>;
+  };
 
-  const { user } = useAuth();
+  const getRelativeTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return '1 day ago';
+    return `${diffInDays} days ago`;
+  };
+
+  // Ensure these match the visual layout from the mockup perfectly
+  const statCards = [
+    { title: 'New Customers', value: stats.customers, up: true, pct: '11%', bgClass: 'from-blue-600 to-blue-400' },
+    { title: 'Open Tasks', value: stats.tasks, up: true, pct: '5%', bgClass: 'from-orange-500 to-orange-400' },
+    { title: 'Completed Tasks', value: stats.completedTasks, up: true, pct: '17%', bgClass: 'from-emerald-500 to-emerald-400' },
+    { title: 'Notifications', value: stats.notifications, up: false, pct: '2%', bgClass: 'from-purple-600 to-purple-400' },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="rounded-3xl glass p-6 border border-white/10 shadow-lg shadow-black/10">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-primary-300 font-semibold">Welcome back</p>
-            <h1 className="mt-2 text-3xl font-semibold text-white tracking-tight">
-              {user?.first_name ? `Hi, ${user.first_name}` : 'Hi there'}, ready for your dashboard?
-            </h1>
-            <p className="text-sm text-gray-400 mt-2 max-w-2xl">
-              Monitor your customers, tasks, and alerts in one place — refreshed live from the API.
-            </p>
-          </div>
-          <button className="self-start sm:self-center bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-primary-500/20 hover-lift">
-            + New Follow-Up
-          </button>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Overview</h2>
-          <p className="text-sm text-gray-400 mt-1">Live customer, task, and alert metrics pulled from the API.</p>
-        </div>
-      </div>
-
+      {/* Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {summary.map((stat, i) => (
+        {statCards.map((stat, i) => (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
+            transition={{ delay: i * 0.05 }}
             key={stat.title}
-            className="glass rounded-2xl p-5 border border-white/5 relative overflow-hidden group hover-lift"
+            className={`rounded-2xl p-6 relative overflow-hidden group hover-lift shadow-glass text-white bg-gradient-to-br ${stat.bgClass}`}
           >
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-10 -mt-10 transition-transform group-hover:scale-110" />
-            <h3 className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2">{stat.title}</h3>
-            <div className="flex items-end justify-between">
-              <p className="text-3xl font-semibold text-white">{loading ? '—' : stat.value}</p>
-              <span className={`flex items-center text-xs font-medium px-1.5 py-0.5 rounded ${stat.up ? 'text-emerald-400 bg-emerald-400/10' : 'text-rose-400 bg-rose-400/10'}`}>
-                {stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {stat.pct}
-              </span>
-            </div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+            <div className="absolute bottom-0 right-8 w-16 h-16 bg-white/5 rounded-full -mb-8 transition-transform group-hover:scale-110" />
+            
+            <h3 className="text-white/80 font-medium tracking-wide mb-1 text-sm md:text-base">{stat.title}</h3>
+            <p className="text-4xl font-bold tracking-tight">{loading ? '—' : stat.value}</p>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass rounded-2xl p-6 border border-white/5">
-          <div className="flex items-center justify-between mb-4 gap-4">
-            <h2 className="text-lg font-semibold text-white">Upcoming Tasks</h2>
-            <span className="text-xs uppercase text-gray-400 tracking-[0.2em]">Realtime</span>
+      {/* Tables Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Customers Table */}
+        <div className="glass rounded-2xl flex flex-col border border-borderMain">
+          <div className="p-4 border-b border-borderMain flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-textMain">
+               Customers
+            </h2>
+            <button className="text-textMuted hover:text-textMain"><MoreHorizontal size={20}/></button>
           </div>
-          {loading ? (
-            <div className="h-48 flex items-center justify-center text-primary-400">Loading tasks...</div>
-          ) : (
-            <div className="space-y-3">
-              {tasks.length > 0 ? tasks.map((task) => (
-                <TaskRow
-                  key={task.id}
-                  title={task.title}
-                  time={new Date(task.due_date).toLocaleString()}
-                  priority={task.priority}
-                  done={task.status === 'Completed'}
-                  status={task.status}
-                />
-              )) : (
-                <div className="text-gray-400 text-sm">No tasks assigned yet.</div>
-              )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-textMuted">
+              <thead className="text-xs bg-surfaceLighter font-medium border-b border-borderMain">
+                <tr>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase">Name</th>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase">Phone</th>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-borderMain">
+                {customers.length > 0 ? customers.map(c => (
+                  <tr key={c.id} className="hover:bg-surfaceLighter/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-textMain">{c.contact_name}</td>
+                    <td className="px-4 py-3">{c.phone || c.email || '—'}</td>
+                    <td className="px-4 py-3">{getStatusBadge(c.status)}</td>
+                  </tr>
+                )) : (
+                  <tr>
+                     <td colSpan={3} className="px-4 py-6 text-center text-sm text-textMuted">No customers available.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Tasks Table */}
+        <div className="glass rounded-2xl flex flex-col border border-borderMain">
+          <div className="p-4 border-b border-borderMain flex items-center justify-between">
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-textMain">
+               Tasks
+            </h2>
+            <div className="flex gap-2">
+              <button className="px-2 py-1 text-xs rounded border border-borderMain hover:bg-surfaceLighter transition">Filter</button>
             </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-textMuted">
+              <thead className="text-xs bg-surfaceLighter font-medium border-b border-borderMain">
+                <tr>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase">Task</th>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase text-center">Due Date</th>
+                  <th className="px-4 py-3 font-semibold text-textMain uppercase text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-borderMain">
+                {tasks.length > 0 ? tasks.map(t => (
+                  <tr key={t.id} className="hover:bg-surfaceLighter/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-textMain truncate max-w-[150px]">{t.title}</td>
+                    <td className="px-4 py-3 text-center text-xs">{new Date(t.due_date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-right">{getStatusBadge(t.status)}</td>
+                  </tr>
+                )) : (
+                  <tr>
+                     <td colSpan={3} className="px-4 py-6 text-center text-sm text-textMuted">No tasks available.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="glass rounded-2xl border border-borderMain flex flex-col">
+        <div className="p-4 border-b border-borderMain flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-textMain">Recent Activity</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-textMuted">Sort by:</span>
+            <button className="text-sm text-textMain font-medium flex items-center gap-1 hover:text-primary-500">
+               Time <ArrowDownRight size={14}/>
+            </button>
+          </div>
+        </div>
+        <div className="p-2 space-y-1">
+          {loading ? (
+             <div className="p-8 text-center text-primary-500">Loading activities...</div>
+          ) : notifications.length > 0 ? (
+             notifications.map(n => (
+               <div key={n.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-surfaceLighter transition-colors">
+                 <div className="flex items-center gap-4">
+                   <div className={`p-2 rounded-full ${n.title.toLowerCase().includes('overdue') || n.title.toLowerCase().includes('cancel') ? 'bg-rose-500/10 text-rose-500' : 'bg-primary-500/10 text-primary-500'}`}>
+                     {n.title.toLowerCase().includes('message') ? <MessageSquare size={18} /> : n.title.toLowerCase().includes('user') || n.title.toLowerCase().includes('customer') ? <UserPlus size={18}/> : <Info size={18} />}
+                   </div>
+                   <div>
+                     <p className="text-sm font-medium text-textMain">{n.title}</p>
+                     <p className="text-xs text-textMuted mt-0.5">{n.message}</p>
+                   </div>
+                 </div>
+                 <div className="text-xs font-medium text-textMuted shrink-0">
+                   {getRelativeTime(n.created_at)}
+                 </div>
+               </div>
+             ))
+          ) : (
+            <div className="p-6 text-center text-sm text-textMuted">No recent active notifications.</div>
           )}
         </div>
-
-        <div className="glass rounded-2xl p-6 border border-white/5">
-          <h2 className="text-lg font-semibold text-rose-400 flex items-center gap-2 mb-4">
-            <Bell size={18} /> Active Alerts
-          </h2>
-          <div className="space-y-4">
-            <AlertRow msg="Client meeting scheduled for tomorrow" days="1 day" />
-            <AlertRow msg="Contract review overdue for Stark Ind" days="2 days" />
-            <AlertRow msg="Follow-up response needed from Bruce Wayne" days="3 days" />
-          </div>
-        </div>
       </div>
-    </div>
-  );
-}
-
-function TaskRow({ title, time, priority, done, status }: any) {
-  const pColor = priority === 'High' ? 'text-rose-400' : priority === 'Medium' ? 'text-amber-400' : 'text-gray-400';
-  return (
-    <div className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${done ? 'border-white/5 bg-white/5 opacity-70' : 'border-white/10 hover:border-primary-500/50 bg-surfaceLighter/50'}`}>
-      <div>
-        <p className={`text-sm font-medium ${done ? 'text-gray-400 line-through' : 'text-gray-200'}`}>{title}</p>
-        <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-          <span>{status}</span>
-          <span className="px-2 py-0.5 rounded-full bg-white/5 text-gray-400">{time}</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className={`text-[10px] font-bold uppercase ${pColor}`}>{priority}</span>
-        {done ? <CheckCircle className="text-emerald-400" size={18} /> : <Clock size={18} className="text-gray-500" />}
-      </div>
-    </div>
-  );
-}
-
-function AlertRow({ msg, days }: any) {
-  return (
-    <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
-      <p className="text-sm text-gray-200 font-medium mb-1">{msg}</p>
-      <p className="text-xs text-rose-400 font-medium">{days} remaining</p>
     </div>
   );
 }

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell, Moon, Sun } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const loadNotifications = async () => {
@@ -69,7 +71,7 @@ export default function Layout() {
       >
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-gradient-to-br from-primary-500 to-brand flex items-center justify-center font-bold text-white shadow-lg">
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-primary-500 to-brand flex items-center justify-center font-bold text-pureWhite shadow-lg">
               FF
             </div>
             <span className="text-xl font-bold text-white tracking-tight">
@@ -98,7 +100,7 @@ export default function Layout() {
                 {item.label}
               </div>
               {item.badge && (
-                <span className="bg-brand text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">
+                <span className="bg-brand text-pureWhite text-[10px] px-2 py-0.5 rounded-full shadow-sm">
                   {item.badge}
                 </span>
               )}
@@ -112,7 +114,7 @@ export default function Layout() {
             className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors bg-white/5"
             title="Click to Log Out"
           >
-            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+            <div className="w-9 h-9 rounded-full bg-primary-600 flex items-center justify-center text-pureWhite text-sm font-bold shrink-0">
               {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
@@ -131,6 +133,15 @@ export default function Layout() {
            </button>
            
            <div className="ml-auto flex items-center gap-6">
+              {/* Theme Toggle */}
+              <button 
+                onClick={toggleTheme}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+                title="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
               {/* Notification System */}
               <div className="relative">
                 <button 

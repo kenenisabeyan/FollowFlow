@@ -31,7 +31,8 @@ export default function Register() {
       return Object.entries(data)
         .map(([key, value]) => {
           const message = Array.isArray(value) ? value.join(' ') : value;
-          return `${key}: ${message}`;
+          const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+          return `${formattedKey}: ${message}`;
         })
         .join(' ');
     }
@@ -201,7 +202,7 @@ export default function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-pureWhite bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
               >
                 {loading ? 'Registering...' : 'Create account'}
               </button>

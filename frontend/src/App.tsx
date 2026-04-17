@@ -10,12 +10,14 @@ import Notifications from './pages/Notifications';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
+import { ThemeProvider } from './context/ThemeContext';
+
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
     return (
-      <div className="h-screen bg-background flex flex-col items-center justify-center text-gray-400">
+      <div className="h-screen flex flex-col items-center justify-center text-gray-400 bg-background text-gray-200">
         <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin mb-4" />
         Loading...
       </div>
@@ -28,7 +30,8 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ThemeProvider>
+        <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -41,6 +44,7 @@ export default function App() {
           </Route>
         </Routes>
       </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

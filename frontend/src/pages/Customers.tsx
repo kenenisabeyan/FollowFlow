@@ -105,8 +105,8 @@ export default function Customers() {
                   <tr key={customer.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-surface border border-white/10 flex items-center justify-center text-xs font-bold text-gray-200">
-                          {customer.contact_name?.charAt(0) || 'U'}
+                        <div className="w-8 h-8 rounded-full bg-surface border border-borderMain flex items-center justify-center text-xs font-bold text-gray-200">
+                          {String(customer.contact_name || customer.company_name || 'U').charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="font-medium text-gray-200">{customer.contact_name}</div>
