@@ -71,7 +71,7 @@ export default function Timeline() {
           <div className="space-y-8 relative z-10">
             {activity.map((act) => (
               <div key={act.id} className="flex gap-4 md:gap-6">
-                <div className="w-8 h-8 rounded-full-full bg-surfaceLighter border border-borderMain flex items-center justify-center shrink-0 mt-1 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center shrink-0 mt-1 shadow-sm">
                   {act.icon}
                 </div>
                 <div className="flex-1 bg-surfaceLighter border border-borderMain p-4 rounded-xl">
@@ -85,7 +85,7 @@ export default function Timeline() {
                     </p>
                   )}
                   <div className="mt-3 flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-full-full bg-surface border border-borderMain flex items-center justify-center text-[10px] text-textMain font-bold">
+                    <div className="w-5 h-5 rounded-full bg-surface border border-borderMain flex items-center justify-center text-[10px] text-textMain font-bold">
                       {act.user.charAt(0)}
                     </div>
                     <span className="text-xs text-textMuted">by {act.user}</span>

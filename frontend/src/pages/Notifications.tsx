@@ -74,19 +74,19 @@ export default function Notifications() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 rounded-full-full border border-borderMain bg-surfaceLighter px-4 py-2 text-sm text-textMain hover:border-primary-500/50 transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border border-borderMain bg-surfaceLighter px-4 py-2 text-sm text-textMain hover:border-primary-500/50 transition-colors"
           >
             <Plus size={16} /> New
           </button>
           <button
             onClick={loadNotifications}
-            className="inline-flex items-center gap-2 rounded-full-full border border-borderMain bg-surfaceLighter px-4 py-2 text-sm text-textMain hover:border-primary-500/50 transition-colors"
+            className="inline-flex items-center gap-2 rounded-full border border-borderMain bg-surfaceLighter px-4 py-2 text-sm text-textMain hover:border-primary-500/50 transition-colors"
           >
             <RefreshCcw size={16} /> Refresh
           </button>
           <button
             onClick={markAllRead}
-            className="inline-flex items-center gap-2 rounded-full-full bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-500 transition-colors"
+            className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-500 transition-colors"
           >
             <CheckCircle2 size={16} /> Mark all read
           </button>
@@ -122,7 +122,7 @@ export default function Notifications() {
                   </div>
                   <button
                     onClick={() => markAsRead(notification.id, notification.is_read)}
-                    className="inline-flex items-center gap-2 rounded-full-full border border-borderMain bg-surfaceLighter px-3 py-2 text-xs text-textMuted hover:border-primary-500/50 hover:text-textMain transition-colors"
+                    className="inline-flex items-center gap-2 rounded-full border border-borderMain bg-surfaceLighter px-3 py-2 text-xs text-textMuted hover:border-primary-500/50 hover:text-textMain transition-colors"
                   >
                     <XCircle size={14} /> {notification.is_read ? 'Mark unread' : 'Mark read'}
                   </button>
