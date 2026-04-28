@@ -10,6 +10,7 @@ export default function Customers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ company_name: '', contact_name: '', email: '' });
+  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -48,14 +49,29 @@ export default function Customers() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('customers/', formData);
+      if (editingCustomerId) {
+        await api.patch(`customers/${editingCustomerId}/`, formData);
+      } else {
+        await api.post('customers/', formData);
+      }
       setShowModal(false);
+      setEditingCustomerId(null);
       setFormData({ company_name: '', contact_name: '', email: '' });
       fetchCustomers();
     } catch (error) {
       alert('Error saving customer. Check your database connection.');
       setShowModal(false);
     }
+  };
+
+  const handleEditCustomer = (customer: any) => {
+    setFormData({
+      company_name: customer.company_name || '',
+      contact_name: customer.contact_name || '',
+      email: customer.email || ''
+    });
+    setEditingCustomerId(customer.id);
+    setShowModal(true);
   };
 
   const handleExportCSV = async () => {
@@ -99,9 +115,9 @@ export default function Customers() {
           >
             <Download size={16} /> Export
           </button>
-          <button
-            onClick={() => setShowModal(true)}
-            className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 hover-lift"
+          <button 
+            onClick={() => { setEditingCustomerId(null); setFormData({ company_name: '', contact_name: '', email: '' }); setShowModal(true); }} 
+            className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
           >
             <Plus size={16} /> Add
           </button>
@@ -141,8 +157,8 @@ export default function Customers() {
                       <StatusBadge status={customer.status} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button onClick={() => alert('Drafting email feature coming soon.')} className="text-textMuted hover:text-textMain p-1 ml-2 transition-colors"><Mail size={16} /></button>
-                      <button onClick={() => alert('Customer editing coming soon.')} className="text-textMuted hover:text-primary-500 p-1 ml-2 transition-colors"><Edit2 size={16} /></button>
+                      <a href={`mailto:${customer.email}`} className="text-textMuted hover:text-textMain p-1 ml-2 transition-colors inline-block" title="Draft Email"><Mail size={16} /></a>
+                      <button onClick={() => handleEditCustomer(customer)} className="text-textMuted hover:text-primary-500 p-1 ml-2 transition-colors" title="Edit Customer"><Edit2 size={16} /></button>
                     </td>
                   </tr>
                 ))}
@@ -159,7 +175,7 @@ export default function Customers() {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
           >
-            <h2 className="text-xl font-bold text-textMain mb-4">Add New Customer</h2>
+            <h3 className="text-lg font-bold text-textMain mb-4">{editingCustomerId ? 'Edit Customer' : 'Add Customer'}</h3>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-xs font-medium text-textMuted mb-1">Company Name</label>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2, PhoneCall } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/client';
 
@@ -11,6 +11,10 @@ export default function Tasks() {
   const [showModal, setShowModal] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [formData, setFormData] = useState({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [showFollowUpModal, setShowFollowUpModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [followUpData, setFollowUpData] = useState({ followup_type: 'Call', outcome: '' });
 
   useEffect(() => {
     fetchTasks();
@@ -52,18 +56,69 @@ export default function Tasks() {
     e.preventDefault();
     if (!formData.customer_id) return alert('Please select a customer.');
     try {
-      await api.post('tasks/', {
-        title: formData.title,
-        description: formData.description,
-        due_date: formData.due_date,
-        priority: formData.priority,
-        customer: formData.customer_id
-      });
+      if (editingTaskId) {
+        await api.patch(`tasks/${editingTaskId}/`, {
+          title: formData.title,
+          description: formData.description,
+          due_date: formData.due_date,
+          priority: formData.priority,
+          customer: formData.customer_id
+        });
+      } else {
+        await api.post('tasks/', {
+          title: formData.title,
+          description: formData.description,
+          due_date: formData.due_date,
+          priority: formData.priority,
+          customer: formData.customer_id
+        });
+      }
       setShowModal(false);
+      setEditingTaskId(null);
       setFormData({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
       fetchTasks();
     } catch (err) {
-      alert('Error creating task.');
+      alert('Error saving task.');
+    }
+  };
+
+  const handleEditTask = (task: any) => {
+    setFormData({ 
+      title: task.title, 
+      description: task.description || '', 
+      customer_id: task.customer || '', 
+      due_date: task.due_date ? task.due_date.slice(0, 16) : '', 
+      priority: task.priority 
+    });
+    setEditingTaskId(task.id);
+    setShowModal(true);
+  };
+
+  const handleDeleteTask = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return;
+    try {
+      await api.delete(`tasks/${id}/`);
+      setTasks(current => current.filter(t => t.id !== id));
+    } catch (err) {
+      alert('Error deleting task.');
+    }
+  };
+
+  const handleFollowUpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTask) return;
+    try {
+      await api.post('followups/', {
+        task: selectedTask.id,
+        followup_type: followUpData.followup_type,
+        outcome: followUpData.outcome
+      });
+      setShowFollowUpModal(false);
+      setSelectedTask(null);
+      setFollowUpData({ followup_type: 'Call', outcome: '' });
+      fetchTasks();
+    } catch (err) {
+      alert('Error logging follow-up.');
     }
   };
 
@@ -101,7 +156,7 @@ export default function Tasks() {
             <RefreshCcw size={16} /> Refresh
           </button>
           <button 
-            onClick={() => setShowModal(true)}
+            onClick={() => { setEditingTaskId(null); setFormData({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' }); setShowModal(true); }}
             className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
           >
             <Plus size={16} /> New Task
@@ -170,10 +225,13 @@ export default function Tasks() {
                     <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2 text-textMuted">
                             {task.status !== 'Completed' && (
-                                <button onClick={() => updateStatus(task, 'Completed')} className="p-1 hover:text-emerald-500" title="Mark Completed"><CheckCircle2 size={16}/></button>
+                                <>
+                                  <button onClick={() => { setSelectedTask(task); setShowFollowUpModal(true); }} className="p-1 hover:text-blue-500 transition-colors" title="Log Follow-Up"><PhoneCall size={16}/></button>
+                                  <button onClick={() => updateStatus(task, 'Completed')} className="p-1 hover:text-emerald-500 transition-colors" title="Mark Completed"><CheckCircle2 size={16}/></button>
+                                </>
                             )}
-                            <button onClick={() => alert('Task editing coming soon.')} className="p-1 hover:text-primary-500"><Edit2 size={16}/></button>
-                            <button onClick={() => alert('Task deletion coming soon.')} className="p-1 hover:text-rose-500"><Trash2 size={16}/></button>
+                            <button onClick={() => handleEditTask(task)} className="p-1 hover:text-primary-500 transition-colors" title="Edit Task"><Edit2 size={16}/></button>
+                            <button onClick={() => handleDeleteTask(task.id)} className="p-1 hover:text-rose-500 transition-colors" title="Delete Task"><Trash2 size={16}/></button>
                         </div>
                     </td>
                   </tr>
@@ -192,7 +250,7 @@ export default function Tasks() {
             animate={{ scale: 1, opacity: 1 }}
             className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
           >
-            <h2 className="text-xl font-bold text-textMain mb-4">Add New Task</h2>
+            <h2 className="text-xl font-bold text-textMain mb-4">{editingTaskId ? 'Edit Task' : 'Add New Task'}</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-xs font-medium text-textMuted mb-1">Task Title</label>
@@ -264,6 +322,60 @@ export default function Tasks() {
                   className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-full text-sm font-medium"
                 >
                   Save Task
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {showFollowUpModal && selectedTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
+          >
+            <h2 className="text-xl font-bold text-textMain mb-4">Log Follow-Up</h2>
+            <p className="text-sm text-textMuted mb-6">Task: <span className="font-semibold text-textMain">{selectedTask.title}</span></p>
+            <form className="space-y-4" onSubmit={handleFollowUpSubmit}>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Interaction Type</label>
+                <select
+                  value={followUpData.followup_type}
+                  onChange={(e) => setFollowUpData({ ...followUpData, followup_type: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                >
+                  <option value="Call">Call</option>
+                  <option value="Email">Email</option>
+                  <option value="Meeting">Meeting</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Outcome / Notes</label>
+                <textarea
+                  required
+                  value={followUpData.outcome}
+                  onChange={(e) => setFollowUpData({ ...followUpData, outcome: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-2xl p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  placeholder="What happened during this follow-up?"
+                  rows={4}
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => { setShowFollowUpModal(false); setSelectedTask(null); }}
+                  className="px-4 py-2 text-sm text-textMuted hover:text-textMain"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-full text-sm font-medium"
+                >
+                  Log Follow-Up
                 </button>
               </div>
             </form>

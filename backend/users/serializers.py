@@ -37,10 +37,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         username = attrs.get(self.username_field)
         email = attrs.get('email')
+        
         if not username and email:
             user = User.objects.filter(email__iexact=email).first()
             if user:
                 attrs[self.username_field] = getattr(user, self.username_field)
+            else:
+                # Prevent KeyError in super().validate if user is not found
+                attrs[self.username_field] = email
+        elif not username:
+            attrs[self.username_field] = ''
 
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user).data
