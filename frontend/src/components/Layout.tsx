@@ -96,14 +96,18 @@ export default function Layout() {
                 }`
               }
             >
-              <div className="flex items-center gap-3 font-medium text-sm">
-                <span className={({ isActive }) => isActive ? 'text-primary-500' : 'text-textMuted'}>{item.icon}</span>
-                {item.label}
-              </div>
-              {item.badge && (
-                <span className="bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-lg-full shadow-sm">
-                  {item.badge}
-                </span>
+              {({ isActive }) => (
+                <>
+                  <div className="flex items-center gap-3 font-medium text-sm">
+                    <span className={isActive ? 'text-primary-500' : 'text-textMuted'}>{item.icon}</span>
+                    {item.label}
+                  </div>
+                  {item.badge && (
+                    <span className="bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">
+                      {item.badge}
+                    </span>
+                  )}
+                </>
               )}
             </NavLink>
           ))}
@@ -115,7 +119,7 @@ export default function Layout() {
             className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-full hover:bg-surfaceLighter transition-colors"
             title="Click to Log Out"
           >
-            <div className="w-9 h-9 rounded-full-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
+            <div className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
               {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0 mt-1">
@@ -144,7 +148,7 @@ export default function Layout() {
               {/* Theme Toggle */}
               <button 
                 onClick={toggleTheme}
-                className="text-textMuted hover:text-textMain transition-colors"
+                className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
                 title="Toggle Theme"
               >
                 {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -154,11 +158,11 @@ export default function Layout() {
               <div className="relative">
                 <button 
                   onClick={() => setNotifOpen(!notifOpen)}
-                  className="relative text-textMuted hover:text-textMain transition-colors flex items-center justify-center"
+                  className="relative w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
                 >
                   <Bell size={18} />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
+                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border border-surface animate-pulse" />
                   )}
                 </button>
 

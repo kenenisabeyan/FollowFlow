@@ -190,7 +190,7 @@ export default function Tasks() {
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-surface w-full max-w-md rounded-full border border-borderMain p-6 shadow-xl"
+            className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
           >
             <h2 className="text-xl font-bold text-textMain mb-4">Add New Task</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -246,7 +246,7 @@ export default function Tasks() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-2xl p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                   placeholder="Optional details"
                   rows={2}
                 />

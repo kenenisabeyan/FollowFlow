@@ -105,7 +105,7 @@ export default function Customers() {
                   <tr key={customer.id} className="hover:bg-surfaceLighter/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-xs font-bold text-textMain">
+                        <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-xs font-bold text-textMain">
                           {String(customer.contact_name || customer.company_name || 'U').charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -135,7 +135,7 @@ export default function Customers() {
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-surface w-full max-w-md rounded-full border border-borderMain p-6 shadow-xl"
+            className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
           >
             <h2 className="text-xl font-bold text-textMain mb-4">Add New Customer</h2>
             <form className="space-y-4" onSubmit={handleSubmit}>

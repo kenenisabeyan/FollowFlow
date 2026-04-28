@@ -188,7 +188,7 @@ export default function Dashboard() {
              notifications.map(n => (
                <div key={n.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-surfaceLighter transition-colors">
                  <div className="flex items-center gap-4">
-                   <div className={`p-2 rounded-lg-full ${n.title.toLowerCase().includes('overdue') || n.title.toLowerCase().includes('cancel') ? 'bg-rose-500/10 text-rose-500' : 'bg-primary-500/10 text-primary-500'}`}>
+                   <div className={`p-2 rounded-full ${n.title.toLowerCase().includes('overdue') || n.title.toLowerCase().includes('cancel') ? 'bg-rose-500/10 text-rose-500' : 'bg-primary-500/10 text-primary-500'}`}>
                      {n.title.toLowerCase().includes('message') ? <MessageSquare size={18} /> : n.title.toLowerCase().includes('user') || n.title.toLowerCase().includes('customer') ? <UserPlus size={18}/> : <Info size={18} />}
                    </div>
                    <div>
