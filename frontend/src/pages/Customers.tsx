@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Edit2, Plus, Mail } from 'lucide-react';
+import { Search, Edit2, Plus, Mail, Download } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../api/client';
 
@@ -58,6 +58,22 @@ export default function Customers() {
     }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const response = await api.get('customers/export_csv/', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'customers_export.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export CSV. Please try again.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -77,6 +93,12 @@ export default function Customers() {
               className="w-full bg-surfaceLighter border border-borderMain rounded-full py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
             />
           </div>
+          <button
+            onClick={handleExportCSV}
+            className="shrink-0 bg-surfaceLighter border border-borderMain hover:bg-surface text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 hover-lift"
+          >
+            <Download size={16} /> Export
+          </button>
           <button
             onClick={() => setShowModal(true)}
             className="shrink-0 bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 hover-lift"

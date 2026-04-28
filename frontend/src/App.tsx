@@ -7,6 +7,7 @@ import Customers from './pages/Customers';
 import Tasks from './pages/Tasks';
 import Timeline from './pages/Timeline';
 import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="tasks" element={<Tasks />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="timeline" element={<Timeline />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
         </Routes>
       </Router>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import edotLogo from '../assets/edot-logo.jpg';
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,13 +68,8 @@ export default function Layout() {
       >
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 flex items-center justify-center">
-              {/* Logo matching the screenshot - blue and red geometry */}
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21.5 6L28 10V18L21.5 22L15 18V10L21.5 6Z" fill="#3B82F6"/>
-                <path d="M10.5 13L17 17V25L10.5 29L4 25V17L10.5 13Z" fill="#EF4444"/>
-                <path d="M17 17L23.5 13L17 9L10.5 13L17 17Z" fill="#60A5FA"/>
-              </svg>
+            <div className="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden border border-borderMain shadow-sm">
+              <img src={edotLogo} alt="EDOT Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-bold text-textMain tracking-tight">
               FollowFlow
@@ -114,19 +110,20 @@ export default function Layout() {
         </nav>
 
         <div className="p-4 border-t border-borderMain">
-          <button
-            onClick={() => logout()}
-            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-full hover:bg-surfaceLighter transition-colors"
-            title="Click to Log Out"
+          <NavLink
+            to="/profile"
+            onClick={() => setSidebarOpen(false)}
+            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-full hover:bg-surfaceLighter transition-colors group"
+            title="View Profile"
           >
             <div className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
               {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0 mt-1">
               <p className="text-sm font-semibold text-textMain truncate">{user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username || 'Admin'}</p>
-              <p className="text-xs text-textMuted font-medium truncate hover:text-rose-500 transition-colors">Log Out</p>
+              <p className="text-xs text-textMuted font-medium truncate group-hover:text-primary-500 transition-colors">View Profile</p>
             </div>
-          </button>
+          </NavLink>
         </div>
       </motion.aside>
 
@@ -199,9 +196,9 @@ export default function Layout() {
               </div>
 
               <div className="hidden md:flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center">
+                <NavLink to="/profile" className="w-7 h-7 rounded-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center hover:border-primary-500 transition-colors" title="View Profile">
                   <span className="text-xs font-bold text-textMain">{user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}</span>
-                </div>
+                </NavLink>
               </div>
            </div>
         </header>
