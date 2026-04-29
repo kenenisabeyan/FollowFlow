@@ -121,7 +121,7 @@ export default function Register() {
                     required
                     value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                     placeholder="First Name"
                   />
                 </div>
@@ -130,7 +130,7 @@ export default function Register() {
                     required
                     value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                     placeholder="Last Name"
                   />
                 </div>
@@ -141,7 +141,7 @@ export default function Register() {
                   required
                   value={formData.username}
                   onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                   placeholder="Username"
                 />
               </div>
@@ -152,7 +152,7 @@ export default function Register() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                  className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                   placeholder="Email Address"
                 />
               </div>
@@ -164,7 +164,7 @@ export default function Register() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                     placeholder="Password"
                   />
                   <button
@@ -181,7 +181,7 @@ export default function Register() {
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-lg bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
+                    className="appearance-none block w-full px-4 py-3 border border-borderMain rounded-full bg-surfaceLighter text-textMain placeholder-textMuted focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm transition-colors"
                     placeholder="Confirm Password"
                   />
                   <button
@@ -198,7 +198,7 @@ export default function Register() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
                 >
                   {loading ? 'Registering...' : 'Register'}
                 </button>

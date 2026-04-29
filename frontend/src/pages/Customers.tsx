@@ -240,7 +240,7 @@ function StatusBadge({ status }: { status: string }) {
     Closed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   };
   return (
-    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-lg inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
+    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
       {status || 'New'}
     </span>
   );
