@@ -75,7 +75,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-surfaceLighter flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans relative overflow-hidden">
+    <div className="light min-h-screen bg-surfaceLighter flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans relative overflow-hidden text-textMain">
       <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-primary-600/10 rounded-full blur-[100px] pointer-events-none" />
 
       <motion.div

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root, .light {
     /* Light Mode */
     --bg-background: #F1F5F9; /* slate-100 */
     --bg-surface: #FFFFFF;    /* white */
