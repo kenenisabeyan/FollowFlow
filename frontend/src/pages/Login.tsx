@@ -11,13 +11,22 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const parseError = (err: any) => {
+    if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+      return 'The server is waking up from inactivity (cold start). Please wait a few seconds and try again.';
+    }
     const data = err?.response?.data;
-    if (!data) return 'Invalid credentials, please try again.';
+    if (!data) {
+      if (err?.message === 'Network Error') {
+        return 'Network error: Unable to connect to server. It may still be starting up, please try again shortly.';
+      }
+      return 'Invalid credentials, please try again.';
+    }
     if (typeof data.detail === 'string') return data.detail;
     if (typeof data === 'string') return data;
     if (typeof data === 'object') {
@@ -34,6 +43,7 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     const payload: any = { password };
     if (email.includes('@')) {
@@ -48,6 +58,8 @@ export default function Login() {
       navigate('/');
     } catch (err: any) {
       setError(parseError(err));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,9 +151,10 @@ export default function Login() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Log In
+                  {isLoading ? 'Signing In...' : 'Log In'}
                 </button>
               </div>
               

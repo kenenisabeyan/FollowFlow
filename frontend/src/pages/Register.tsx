@@ -24,8 +24,16 @@ export default function Register() {
   const navigate = useNavigate();
 
   const parseError = (err: any) => {
+    if (err?.code === 'ECONNABORTED' || err?.message?.includes('timeout')) {
+      return 'The server is waking up from inactivity (cold start). Please wait a few seconds and try again.';
+    }
     const data = err?.response?.data;
-    if (!data) return 'Registration failed.';
+    if (!data) {
+      if (err?.message === 'Network Error') {
+        return 'Network error: Unable to connect to server. It may still be starting up, please try again shortly.';
+      }
+      return 'Registration failed. Please try again.';
+    }
     if (typeof data.detail === 'string') return data.detail;
     if (typeof data === 'string') return data;
     if (typeof data === 'object') {
