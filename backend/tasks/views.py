@@ -8,7 +8,6 @@ from django.db import transaction
 
 from .models import Task, FollowUp
 from .serializers import TaskSerializer, FollowUpSerializer
-from customers.models import ActivityLog
 
 class TaskViewSet(viewsets.ModelViewSet):
     """
@@ -27,37 +26,22 @@ class TaskViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = Task.objects.select_related('customer', 'assigned_to').prefetch_related('follow_ups')
         
-        # Admins/Managers can see all company tasks if staff, otherwise filter by assigned_to
         if getattr(user, 'role', 'ADMIN') in ['ADMIN', 'MANAGER'] and getattr(user, 'is_staff', False):
             return qs.order_by('due_date')
         return qs.filter(assigned_to=user).order_by('due_date')
 
     def perform_create(self, serializer):
-        with transaction.atomic():
-            task = serializer.save(assigned_to=self.request.user)
-            ActivityLog.objects.create(
-                user=self.request.user,
-                customer=task.customer,
-                action_type="TASK_CREATED",
-                metadata_json={"task_id": task.id, "title": task.title, "priority": task.priority}
-            )
+        serializer.save(assigned_to=self.request.user)
 
     @action(detail=True, methods=['post'], url_path='complete')
     def complete(self, request, pk=None):
         """
-        Marks a specific task as Completed.
+        Marks a specific task as Completed (triggers notification and activity log via signal).
         """
         task = self.get_object()
         with transaction.atomic():
             task.status = 'Completed'
             task.save(update_fields=['status', 'updated_at'])
-
-            ActivityLog.objects.create(
-                user=request.user,
-                customer=task.customer,
-                action_type="TASK_COMPLETED",
-                metadata_json={"task_id": task.id, "title": task.title}
-            )
 
         return Response({
             "id": task.id,
@@ -137,15 +121,4 @@ class FollowUpViewSet(viewsets.ModelViewSet):
         ).order_by('-executed_at')
 
     def perform_create(self, serializer):
-        with transaction.atomic():
-            followup = serializer.save(executed_by=self.request.user)
-            ActivityLog.objects.create(
-                user=self.request.user,
-                customer=followup.task.customer,
-                action_type="FOLLOWUP_LOGGED",
-                metadata_json={
-                    "task_id": followup.task.id,
-                    "type": followup.followup_type,
-                    "outcome": followup.outcome[:100] if followup.outcome else ""
-                }
-            )
+        serializer.save(executed_by=self.request.user)
