@@ -1,0 +1,733 @@
+[
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$t0ydBGY94oma8UwKfRyaG4$WauSPtFpB7cGZrG0dQc1YQRVjBfuvspnR3E6n1mbR2g=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "keneisa",
+    "first_name": "Kenenisa",
+    "last_name": "Beyan",
+    "email": "kenenisab05@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T10:42:13.298Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$J9UHFN9Wj8gAwk0houi6V1$nKupDlah8EP8Q0LYnV3ETR/e/yRAxJoUPZgzG9V9aUE=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "kene",
+    "first_name": "kene",
+    "last_name": "kena",
+    "email": "kene@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T11:44:53.200Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$uIk5iYRRocskyngHVE1Zm3$D07bQb7zMUUc6+G67TE+NS/JugTpGPgW0pgVc0IrLgU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser",
+    "first_name": "Test",
+    "last_name": "User",
+    "email": "test@followflow.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T23:11:11.913Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$AmG1O6AMelPj9gIMF71x2m$dt85RMSPBx4XIUjo0pUUdmE5AkWFtq/byT9hXpgFeqI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "admin",
+    "first_name": "Admin",
+    "last_name": "User",
+    "email": "admin@followflow.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T23:11:13.018Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$fjqb2AxakUzlcKlcRCutEB$AsXqQxNdxTx9l1frHPStAWeC9OK0AMFXpX4p45nyzCQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "kenooo",
+    "first_name": "kenoo",
+    "last_name": "beyan",
+    "email": "kenoooo@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T23:43:07.452Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$A1iyn3CDZj1gAJZYo1j3Cf$Y4lbIVw+FLThITPHUt84r3oe1XM61rDm6sq8EoS5dqA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "kenenisa",
+    "first_name": "kenoo",
+    "last_name": "beyan",
+    "email": "kenoooo@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-16T23:53:15.067Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$zrx7XPjy4MrotioTZ2NzeY$5Z29/fyjK9VfOpo+gRFzH21htglIpepf7EPwCMvonrA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser_1776384050",
+    "first_name": "Test",
+    "last_name": "User",
+    "email": "test_1776384050@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-17T00:00:52.518Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$eRVzW1MAcAymCTVc1C0eUw$cxKIuaaCC2/dqy1DNb85YMHswyGkr6XEb8yTHW6JbAc=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser_1776384582",
+    "first_name": "Test",
+    "last_name": "User",
+    "email": "test_1776384582@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-17T00:09:45.162Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$USKA3OZVgnLWgB9kK1oqsC$s1MNiCpe88BU1OeB9pveN2ckLJMbQn+lIeX3A/inkYU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "gutr",
+    "first_name": "gute",
+    "last_name": "beyan",
+    "email": "gute@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-17T00:20:45.081Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$rtSDGMwRQ8PZebUXya3p9M$gqUaYYJ8GR+WppsUIpkgJwy5kH8N7qIyV4ebJVX6Q0E=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "enako",
+    "first_name": "enake",
+    "last_name": "tokko",
+    "email": "ana@astu.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-17T14:20:28.782Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "light",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$7WiHX6JyY8K3wjQItlRlQT$6qu+3J9A4VReLn4+5dXpIdrW3F80qLZsiKegwJkSXgo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "kenenisab05@gmail.com",
+    "first_name": "enake",
+    "last_name": "tokko",
+    "email": "ana@astu.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-17T19:51:17.658Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "dark",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$9jeEIe8QNo84rE4q34NNgH$tjCSjHPgMBFZHGrA/8+7vm1udYI7MJgAJCsG+nKOw1w=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "keno",
+    "first_name": "keno",
+    "last_name": "beyan",
+    "email": "keno@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-28T03:24:30.564Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "light",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$SwrjLjUE537RmDd118Sspw$yKCsVd2cPJpdt8DPD6MIoeKOGWPNJ/GZTPXVRrw3lrU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "keneni",
+    "first_name": "kenenisa",
+    "last_name": "beyan",
+    "email": "kenenisa@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-28T10:38:31.314Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "light",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$Dgn4fp0qmDRrJxlWQtF6VL$OQ1IC33JmtyM6Iey2XpfAfyK9F8jrhn4w3MEEbEBZPU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "yoba",
+    "first_name": "yobsangirma",
+    "last_name": "girma",
+    "email": "yobsan@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-04-29T08:32:02.949Z",
+    "phone_number": null,
+    "company_name": null,
+    "role": "ADMIN",
+    "theme_preference": "light",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 1,
+  "fields": {
+    "company_name": "edot",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@gmail.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:32:03.026Z",
+    "updated_at": "2026-04-17T18:32:03.026Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 2,
+  "fields": {
+    "company_name": "edotplatform",
+    "contact_name": "kidane",
+    "email": "kidane@company.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:32:42.351Z",
+    "updated_at": "2026-04-17T18:32:42.351Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 3,
+  "fields": {
+    "company_name": "wabiskills",
+    "contact_name": "ermias",
+    "email": "ermi@wabiskills.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:33:18.427Z",
+    "updated_at": "2026-04-17T18:33:18.427Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 4,
+  "fields": {
+    "company_name": "yomtech global",
+    "contact_name": "ermias",
+    "email": "ermias@yomtech.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:34:07.759Z",
+    "updated_at": "2026-04-17T18:34:07.759Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 5,
+  "fields": {
+    "company_name": "evangadi",
+    "contact_name": "kidus",
+    "email": "kidus@evengadi.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:34:48.192Z",
+    "updated_at": "2026-04-17T18:34:48.192Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 6,
+  "fields": {
+    "company_name": "Astu",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@astu.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:36:20.527Z",
+    "updated_at": "2026-04-17T18:36:20.527Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 7,
+  "fields": {
+    "company_name": "CSEC",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@csec.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:36:52.608Z",
+    "updated_at": "2026-04-17T18:36:52.608Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 8,
+  "fields": {
+    "company_name": "africans silican",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@africans.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:37:27.855Z",
+    "updated_at": "2026-04-17T18:37:27.855Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 9,
+  "fields": {
+    "company_name": "google",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@google.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:38:10.990Z",
+    "updated_at": "2026-04-17T18:38:10.990Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 10,
+  "fields": {
+    "company_name": "amazon",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@amazon.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:38:41.993Z",
+    "updated_at": "2026-04-17T18:38:41.993Z"
+  }
+},
+{
+  "model": "customers.customer",
+  "pk": 11,
+  "fields": {
+    "company_name": "alibaba",
+    "contact_name": "kenenisa",
+    "email": "kenenisa@alibaba.com",
+    "phone": null,
+    "status": "New",
+    "lead_value": "0.00",
+    "notes": null,
+    "owner": [
+      "gutr"
+    ],
+    "created_at": "2026-04-17T18:39:08.175Z",
+    "updated_at": "2026-04-17T18:39:08.175Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 1,
+  "fields": {
+    "customer": 11,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "dashboard",
+    "description": "in effective way okay don'tforget that one",
+    "status": "Pending",
+    "priority": "Low",
+    "due_date": "2026-04-17T21:53:00Z",
+    "created_at": "2026-04-17T18:53:52.989Z",
+    "updated_at": "2026-04-17T18:53:52.989Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 2,
+  "fields": {
+    "customer": 8,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "homa page",
+    "description": "for effective team",
+    "status": "Pending",
+    "priority": "High",
+    "due_date": "2026-04-17T21:54:00Z",
+    "created_at": "2026-04-17T18:54:27.627Z",
+    "updated_at": "2026-04-17T18:54:27.627Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 3,
+  "fields": {
+    "customer": 7,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "about pages",
+    "description": "increase performace",
+    "status": "Pending",
+    "priority": "Medium",
+    "due_date": "2026-04-17T09:54:00Z",
+    "created_at": "2026-04-17T18:55:06.188Z",
+    "updated_at": "2026-04-17T18:55:06.188Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 4,
+  "fields": {
+    "customer": 4,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "coursespage",
+    "description": "don't do in careless way okay;",
+    "status": "Pending",
+    "priority": "Low",
+    "due_date": "2026-04-17T10:56:00Z",
+    "created_at": "2026-04-17T18:55:45.935Z",
+    "updated_at": "2026-04-17T18:55:45.935Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 5,
+  "fields": {
+    "customer": 3,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "login pages",
+    "description": "authentications",
+    "status": "Pending",
+    "priority": "Medium",
+    "due_date": "2026-04-17T11:58:00Z",
+    "created_at": "2026-04-17T18:56:33.470Z",
+    "updated_at": "2026-04-17T18:56:33.470Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 6,
+  "fields": {
+    "customer": 9,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "registers",
+    "description": "for authentications",
+    "status": "Pending",
+    "priority": "Low",
+    "due_date": "2026-04-17T14:56:00Z",
+    "created_at": "2026-04-17T18:57:20.620Z",
+    "updated_at": "2026-04-17T18:57:20.620Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 7,
+  "fields": {
+    "customer": 3,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "user handle",
+    "description": "ensur that",
+    "status": "Pending",
+    "priority": "Low",
+    "due_date": "2026-04-17T21:57:00Z",
+    "created_at": "2026-04-17T18:57:54.658Z",
+    "updated_at": "2026-04-17T18:57:54.658Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 8,
+  "fields": {
+    "customer": 2,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "managements",
+    "description": "be mmodern and flexibles",
+    "status": "Pending",
+    "priority": "High",
+    "due_date": "2026-04-17T21:58:00Z",
+    "created_at": "2026-04-17T18:58:44.736Z",
+    "updated_at": "2026-04-17T18:58:44.736Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 9,
+  "fields": {
+    "customer": 1,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "welcome",
+    "description": "to high quality",
+    "status": "Pending",
+    "priority": "High",
+    "due_date": "2026-04-17T15:59:00Z",
+    "created_at": "2026-04-17T18:59:44.041Z",
+    "updated_at": "2026-04-17T18:59:44.041Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 10,
+  "fields": {
+    "customer": 10,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "one to one",
+    "description": "",
+    "status": "Pending",
+    "priority": "Medium",
+    "due_date": "2026-04-17T16:06:00Z",
+    "created_at": "2026-04-17T19:00:22.915Z",
+    "updated_at": "2026-04-17T19:00:22.915Z"
+  }
+},
+{
+  "model": "tasks.task",
+  "pk": 11,
+  "fields": {
+    "customer": 5,
+    "assigned_to": [
+      "gutr"
+    ],
+    "title": "formulti",
+    "description": "tt",
+    "status": "Pending",
+    "priority": "Medium",
+    "due_date": "2026-04-17T22:00:00Z",
+    "created_at": "2026-04-17T19:00:59.020Z",
+    "updated_at": "2026-04-17T19:00:59.020Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "gutr"
+    ],
+    "title": "meeting time",
+    "message": "all members have being on time",
+    "is_read": true,
+    "created_at": "2026-04-17T19:01:38.454Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "gutr"
+    ],
+    "title": "about projects",
+    "message": "all members across platforms are being available",
+    "is_read": true,
+    "created_at": "2026-04-17T19:44:43.766Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "gutr"
+    ],
+    "title": "news",
+    "message": "about be adabtability and flexible",
+    "is_read": true,
+    "created_at": "2026-04-17T19:45:18.401Z"
+  }
+},
+{
+  "model": "notifications.notification",
+  "pk": 4,
+  "fields": {
+    "user": [
+      "gutr"
+    ],
+    "title": "about time managements",
+    "message": "take all or bring all materials wich are used for this one okay",
+    "is_read": true,
+    "created_at": "2026-04-17T19:46:27.200Z"
+  }
+}
+]
