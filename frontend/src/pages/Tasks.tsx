@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2, PhoneCall, X } from 'lucide-react';
+import { Calendar, AlertCircle, CheckCircle2, Circle, RefreshCcw, Plus, Search, Edit2, Trash2, PhoneCall, X, User, Clock, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function Tasks() {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState<any[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -13,7 +16,14 @@ export default function Tasks() {
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
-  const [formData, setFormData] = useState({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    customer_id: '',
+    due_date: '',
+    priority: 'Medium',
+    assigned_to: '',
+  });
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +36,7 @@ export default function Tasks() {
   useEffect(() => {
     fetchTasks();
     fetchCustomers();
+    fetchTeam();
   }, []);
 
   const fetchCustomers = async () => {
@@ -34,6 +45,15 @@ export default function Tasks() {
       setCustomers(res.data || []);
     } catch (err) {
       console.error('Failed to load customers for dropdown', err);
+    }
+  };
+
+  const fetchTeam = async () => {
+    try {
+      const res = await api.get('auth/team/');
+      setTeamMembers(res.data || []);
+    } catch (err) {
+      console.error('Failed to load team members', err);
     }
   };
 
@@ -47,6 +67,18 @@ export default function Tasks() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handle1ClickComplete = async (task: any) => {
+    try {
+      const response = await api.post(`tasks/${task.id}/complete/`);
+      setTasks((current) =>
+        current.map((item) => (item.id === task.id ? { ...item, status: 'Completed' } : item))
+      );
+      setAlertMsg({ type: 'success', text: `Task "${task.title}" completed! Great job! 🎉` });
+    } catch (err) {
+      setAlertMsg({ type: 'error', text: 'Could not complete task.' });
     }
   };
 
@@ -71,13 +103,17 @@ export default function Tasks() {
     setAlertMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         title: formData.title,
         description: formData.description,
         due_date: formData.due_date,
         priority: formData.priority,
         customer: Number(formData.customer_id),
       };
+
+      if (formData.assigned_to) {
+        payload.assigned_to = Number(formData.assigned_to);
+      }
 
       if (editingTaskId) {
         await api.patch(`tasks/${editingTaskId}/`, payload);
@@ -88,7 +124,14 @@ export default function Tasks() {
       }
       setShowModal(false);
       setEditingTaskId(null);
-      setFormData({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
+      setFormData({
+        title: '',
+        description: '',
+        customer_id: '',
+        due_date: '',
+        priority: 'Medium',
+        assigned_to: '',
+      });
       fetchTasks();
     } catch (err: any) {
       const msg = err?.response?.data?.detail || 'Error saving task. Please check date and details.';
@@ -100,12 +143,13 @@ export default function Tasks() {
 
   const handleEditTask = (task: any) => {
     const custId = task.customer?.id || task.customer || '';
-    setFormData({ 
-      title: task.title, 
-      description: task.description || '', 
-      customer_id: String(custId), 
-      due_date: task.due_date ? task.due_date.slice(0, 16) : '', 
-      priority: task.priority || 'Medium'
+    setFormData({
+      title: task.title,
+      description: task.description || '',
+      customer_id: String(custId),
+      due_date: task.due_date ? task.due_date.slice(0, 16) : '',
+      priority: task.priority || 'Medium',
+      assigned_to: task.assigned_to ? String(task.assigned_to) : '',
     });
     setEditingTaskId(task.id);
     setShowModal(true);
@@ -115,7 +159,7 @@ export default function Tasks() {
     if (!taskToDelete) return;
     try {
       await api.delete(`tasks/${taskToDelete.id}/`);
-      setTasks(current => current.filter(t => t.id !== taskToDelete.id));
+      setTasks((current) => current.filter((t) => t.id !== taskToDelete.id));
       setAlertMsg({ type: 'success', text: 'Task deleted successfully.' });
     } catch (err) {
       setAlertMsg({ type: 'error', text: 'Error deleting task.' });
@@ -132,7 +176,7 @@ export default function Tasks() {
       await api.post('followups/', {
         task: selectedTask.id,
         followup_type: followUpData.followup_type,
-        outcome: followUpData.outcome
+        outcome: followUpData.outcome,
       });
       setShowFollowUpModal(false);
       setSelectedTask(null);
@@ -152,7 +196,7 @@ export default function Tasks() {
     if (status === 'In Progress') colors = 'bg-amber-500/10 text-amber-500 border-amber-500/20';
     if (status === 'Completed') colors = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
     if (status === 'Overdue') colors = 'bg-rose-500/10 text-rose-500 border-rose-500/20';
-    
+
     return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border inline-block ${colors}`}>{status}</span>;
   };
 
@@ -164,10 +208,27 @@ export default function Tasks() {
     return <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full inline-block ${colors}`}>{priority}</span>;
   };
 
-  const filteredTasks = tasks.filter(t => {
-    const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  // Metrics counts
+  const totalCount = tasks.length;
+  const pendingCount = tasks.filter((t) => t.status === 'Pending').length;
+  const inProgressCount = tasks.filter((t) => t.status === 'In Progress').length;
+  const completedCount = tasks.filter((t) => t.status === 'Completed').length;
+  const overdueCount = tasks.filter((t) => {
+    if (t.status === 'Completed') return false;
+    return new Date(t.due_date) < new Date() || t.status === 'Overdue';
+  }).length;
+
+  const filteredTasks = tasks.filter((t) => {
+    const matchesSearch =
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (t.customer_detail?.company_name || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || t.status === statusFilter;
+
+    let matchesStatus = true;
+    if (statusFilter === 'Overdue') {
+      matchesStatus = t.status === 'Overdue' || (t.status !== 'Completed' && new Date(t.due_date) < new Date());
+    } else if (statusFilter !== 'All') {
+      matchesStatus = t.status === statusFilter;
+    }
     return matchesSearch && matchesStatus;
   });
 
@@ -200,21 +261,60 @@ export default function Tasks() {
         )}
       </AnimatePresence>
 
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-textMain tracking-tight">Tasks & Operational Workflows</h1>
-          <p className="text-sm text-textMuted mt-1">Track assignments, follow-ups, deadlines, and automated status transitions.</p>
+          <p className="text-sm text-textMuted mt-1">Track assignments, team delegations, reminders, and follow-up activities.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={fetchTasks} className="bg-surface border border-borderMain text-textMuted hover:text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+          <button
+            onClick={fetchTasks}
+            className="bg-surface border border-borderMain text-textMuted hover:text-textMain px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2"
+          >
             <RefreshCcw size={16} /> Refresh
           </button>
-          <button 
-            onClick={() => { setEditingTaskId(null); setFormData({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' }); setShowModal(true); }}
+          <button
+            onClick={() => {
+              setEditingTaskId(null);
+              setFormData({
+                title: '',
+                description: '',
+                customer_id: '',
+                due_date: '',
+                priority: 'Medium',
+                assigned_to: '',
+              });
+              setShowModal(true);
+            }}
             className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm flex items-center gap-2"
           >
             <Plus size={16} /> New Task
           </button>
+        </div>
+      </div>
+
+      {/* Operational KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="bg-surface border border-borderMain p-4 rounded-2xl shadow-sm text-center">
+          <p className="text-xs font-medium text-textMuted">Total Workflows</p>
+          <p className="text-xl font-bold text-textMain mt-1">{totalCount}</p>
+        </div>
+        <div className="bg-surface border border-borderMain p-4 rounded-2xl shadow-sm text-center">
+          <p className="text-xs font-medium text-blue-500">Pending</p>
+          <p className="text-xl font-bold text-textMain mt-1">{pendingCount}</p>
+        </div>
+        <div className="bg-surface border border-borderMain p-4 rounded-2xl shadow-sm text-center">
+          <p className="text-xs font-medium text-amber-500">In Progress</p>
+          <p className="text-xl font-bold text-textMain mt-1">{inProgressCount}</p>
+        </div>
+        <div className="bg-surface border border-borderMain p-4 rounded-2xl shadow-sm text-center">
+          <p className="text-xs font-medium text-emerald-500">Completed</p>
+          <p className="text-xl font-bold text-textMain mt-1">{completedCount}</p>
+        </div>
+        <div className="bg-surface border border-borderMain p-4 rounded-2xl shadow-sm text-center col-span-2 sm:col-span-1">
+          <p className="text-xs font-medium text-rose-500">Overdue Alerts</p>
+          <p className="text-xl font-bold text-rose-500 mt-1">{overdueCount}</p>
         </div>
       </div>
 
@@ -226,7 +326,7 @@ export default function Tasks() {
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 rounded-full font-semibold transition-all ${
               statusFilter === s
-                ? 'bg-primary-600 text-white'
+                ? 'bg-primary-600 text-white shadow-sm'
                 : 'bg-surface border border-borderMain text-textMuted hover:text-textMain'
             }`}
           >
@@ -235,76 +335,116 @@ export default function Tasks() {
         ))}
       </div>
 
-      <div className="bg-surface rounded-2xl border border-borderMain overflow-hidden flex flex-col">
+      {/* Table Container */}
+      <div className="bg-surface rounded-2xl border border-borderMain overflow-hidden flex flex-col shadow-sm">
         <div className="p-4 border-b border-borderMain flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="relative flex-1 w-full max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
-                <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                type="text"
-                placeholder="Search tasks, customers..."
-                className="w-full bg-surfaceLighter border border-borderMain rounded-full py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
-                />
-            </div>
-            <div className="text-sm font-medium text-textMuted">
-              Total {filteredTasks.length} tasks
-            </div>
+          <div className="relative flex-1 w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted" size={16} />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              type="text"
+              placeholder="Search tasks, customers..."
+              className="w-full bg-surfaceLighter border border-borderMain rounded-full py-2 pl-9 pr-4 text-sm text-textMain focus:outline-none focus:border-primary-500/50 transition-all shadow-inner"
+            />
+          </div>
+          <div className="text-sm font-medium text-textMuted">Total {filteredTasks.length} tasks</div>
         </div>
 
         {error && <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-4 m-4 text-sm text-rose-500">{error}</div>}
 
         <div className="overflow-x-auto w-full">
-            <table className="w-full text-left text-sm text-textMuted whitespace-nowrap">
-              <thead className="text-xs bg-surfaceLighter text-textMuted uppercase border-b border-borderMain">
+          <table className="w-full text-left text-sm text-textMuted whitespace-nowrap">
+            <thead className="text-xs bg-surfaceLighter text-textMuted uppercase border-b border-borderMain">
+              <tr>
+                <th className="px-6 py-4 font-semibold">Customer Account</th>
+                <th className="px-6 py-4 font-semibold">Task Title</th>
+                <th className="px-6 py-4 font-semibold">Due Date</th>
+                <th className="px-6 py-4 font-semibold">Priority</th>
+                <th className="px-6 py-4 font-semibold">Status</th>
+                <th className="px-6 py-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-borderMain bg-surface">
+              {loading ? (
                 <tr>
-                  <th className="px-6 py-4 font-semibold">Customer</th>
-                  <th className="px-6 py-4 font-semibold">Task Title</th>
-                  <th className="px-6 py-4 font-semibold">Due Date</th>
-                  <th className="px-6 py-4 font-semibold">Priority</th>
-                  <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                  <td colSpan={6} className="px-6 py-12 text-center text-primary-500 font-medium">
+                    Loading tasks data...
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-borderMain bg-surface">
-                {loading ? (
-                    <tr><td colSpan={6} className="px-6 py-12 text-center">Loading tasks data...</td></tr>
-                ) : paginatedTasks.length > 0 ? paginatedTasks.map((task) => (
+              ) : paginatedTasks.length > 0 ? (
+                paginatedTasks.map((task) => (
                   <tr key={task.id} className="hover:bg-surfaceLighter/50 transition-colors group">
                     <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary-500/20 text-primary-600 flex items-center justify-center font-bold text-xs">
-                                {String(task.customer_detail?.company_name || task.customer || 'C').charAt(0).toUpperCase()}
-                            </div>
-                            <span className="font-medium text-textMain">{task.customer_detail?.company_name || `Customer #${task.customer}`}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary-500/10 text-primary-600 border border-primary-500/20 flex items-center justify-center font-bold text-xs shrink-0">
+                          {String(task.customer_detail?.company_name || task.customer || 'C').charAt(0).toUpperCase()}
                         </div>
+                        <span className="font-semibold text-textMain">
+                          {task.customer_detail?.company_name || `Customer #${task.customer}`}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-textMain font-medium">{task.title}</td>
-                    <td className="px-6 py-4">{new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                     <td className="px-6 py-4">
-                      {getPriorityBadge(task.priority)}
+                      {new Date(task.due_date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                     </td>
-                    <td className="px-6 py-4">
-                        {getStatusBadge(task.status)}
-                    </td>
+                    <td className="px-6 py-4">{getPriorityBadge(task.priority)}</td>
+                    <td className="px-6 py-4">{getStatusBadge(task.status)}</td>
                     <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 text-textMuted">
-                            {task.status !== 'Completed' && (
-                                <>
-                                  <button onClick={() => { setSelectedTask(task); setShowFollowUpModal(true); }} className="p-1 hover:text-blue-500 transition-colors" title="Log Follow-Up"><PhoneCall size={16}/></button>
-                                  <button onClick={() => updateStatus(task, 'Completed')} className="p-1 hover:text-emerald-500 transition-colors" title="Mark Completed"><CheckCircle2 size={16}/></button>
-                                </>
-                            )}
-                            <button onClick={() => handleEditTask(task)} className="p-1 hover:text-primary-500 transition-colors" title="Edit Task"><Edit2 size={16}/></button>
-                            <button onClick={() => setTaskToDelete(task)} className="p-1 hover:text-rose-500 transition-colors" title="Delete Task"><Trash2 size={16}/></button>
-                        </div>
+                      <div className="flex items-center justify-end gap-2 text-textMuted">
+                        {task.status !== 'Completed' && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setSelectedTask(task);
+                                setShowFollowUpModal(true);
+                              }}
+                              className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
+                              title="Log Follow-Up Interaction"
+                            >
+                              <PhoneCall size={16} />
+                            </button>
+                            <button
+                              onClick={() => handle1ClickComplete(task)}
+                              className="p-1.5 rounded-full hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors"
+                              title="1-Click Complete"
+                            >
+                              <CheckCircle2 size={16} />
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => handleEditTask(task)}
+                          className="p-1.5 rounded-full hover:bg-primary-500/10 hover:text-primary-500 transition-colors"
+                          title="Edit Task"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => setTaskToDelete(task)}
+                          className="p-1.5 rounded-full hover:bg-rose-500/10 hover:text-rose-500 transition-colors"
+                          title="Delete Task"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                )) : (
-                    <tr><td colSpan={6} className="px-6 py-12 text-center text-textMuted">No tasks found. Try altering your filter or create a new one.</td></tr>
-                )}
-              </tbody>
-            </table>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-textMuted">
+                    No tasks found. Try altering your filter or create a new one.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination Bar */}
@@ -312,10 +452,8 @@ export default function Tasks() {
           <div className="p-4 border-t border-borderMain flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-textMuted bg-surfaceLighter">
             <div>
               Showing <span className="font-semibold text-textMain">{(currentPage - 1) * pageSize + 1}</span> to{' '}
-              <span className="font-semibold text-textMain">
-                {Math.min(currentPage * pageSize, filteredTasks.length)}
-              </span>{' '}
-              of <span className="font-semibold text-textMain">{filteredTasks.length}</span> tasks
+              <span className="font-semibold text-textMain">{Math.min(currentPage * pageSize, filteredTasks.length)}</span> of{' '}
+              <span className="font-semibold text-textMain">{filteredTasks.length}</span> tasks
             </div>
             <div className="flex items-center gap-1.5">
               <button
@@ -361,6 +499,7 @@ export default function Tasks() {
                   placeholder="Review proposed contract"
                 />
               </div>
+
               <div>
                 <label className="block text-xs font-medium text-textMuted mb-1">Customer Account *</label>
                 <select
@@ -370,11 +509,33 @@ export default function Tasks() {
                   className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                 >
                   <option value="">Select Customer</option>
-                  {customers.map(c => (
-                    <option key={c.id} value={c.id}>{c.contact_name} {c.company_name ? `(${c.company_name})` : ''}</option>
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.contact_name} {c.company_name ? `(${c.company_name})` : ''}
+                    </option>
                   ))}
                 </select>
               </div>
+
+              {/* Team Member Delegation */}
+              {teamMembers.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-textMuted mb-1">Assignee (ERP Delegation)</label>
+                  <select
+                    value={formData.assigned_to}
+                    onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+                    className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  >
+                    <option value="">Self (Default)</option>
+                    {teamMembers.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.username} ({m.role || 'AGENT'}) {m.first_name ? `— ${m.first_name}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-medium text-textMuted mb-1">Due Date & Time *</label>
                 <input
@@ -385,6 +546,7 @@ export default function Tasks() {
                   className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
                 />
               </div>
+
               <div>
                 <label className="block text-xs font-medium text-textMuted mb-1">Priority</label>
                 <select
@@ -397,20 +559,74 @@ export default function Tasks() {
                   <option value="High">High</option>
                 </select>
               </div>
+
               <div>
-                <label className="block text-xs font-medium text-textMuted mb-1">Description & Scope</label>
+                <label className="block text-xs font-medium text-textMuted mb-1">Description / Notes</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full bg-surfaceLighter border border-borderMain rounded-2xl p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
-                  placeholder="Specific requirements or action items..."
+                  placeholder="Task context, instructions, deliverables..."
                   rows={2}
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-textMuted hover:text-textMain">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-full text-sm font-medium transition-colors"
+                >
+                  {isSubmitting ? 'Saving...' : 'Save Task'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Follow-up Interaction Modal */}
+      {showFollowUpModal && selectedTask && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface w-full max-w-sm rounded-2xl border border-borderMain p-6 shadow-xl"
+          >
+            <h3 className="text-lg font-bold text-textMain mb-2">Log Follow-Up Interaction</h3>
+            <p className="text-xs text-textMuted mb-4">Task: "{selectedTask.title}"</p>
+            <form className="space-y-4" onSubmit={handleFollowUpSubmit}>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Interaction Type</label>
+                <select
+                  value={followUpData.followup_type}
+                  onChange={(e) => setFollowUpData({ ...followUpData, followup_type: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                >
+                  <option value="Call">Phone Call</option>
+                  <option value="Email">Email Communication</option>
+                  <option value="Meeting">Client Meeting / Demo</option>
+                  <option value="Other">Other Touchpoint</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-textMuted mb-1">Outcome & Notes</label>
+                <textarea
+                  required
+                  value={followUpData.outcome}
+                  onChange={(e) => setFollowUpData({ ...followUpData, outcome: e.target.value })}
+                  className="w-full bg-surfaceLighter border border-borderMain rounded-2xl p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  placeholder="Summarize conversation outcome, agreements..."
+                  rows={3}
                 />
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => setShowFollowUpModal(false)}
                   className="px-4 py-2 text-sm text-textMuted hover:text-textMain"
                 >
                   Cancel
@@ -420,7 +636,7 @@ export default function Tasks() {
                   disabled={isSubmitting}
                   className="px-5 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-full text-sm font-medium transition-colors"
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Task'}
+                  {isSubmitting ? 'Saving...' : 'Save & Advance Task'}
                 </button>
               </div>
             </form>
@@ -441,13 +657,10 @@ export default function Tasks() {
             </div>
             <h3 className="text-lg font-bold text-textMain">Delete Task?</h3>
             <p className="text-sm text-textMuted mt-2">
-              Are you sure you want to delete <span className="font-semibold text-textMain">{taskToDelete.title}</span>?
+              Are you sure you want to delete <span className="font-semibold text-textMain">"{taskToDelete.title}"</span>?
             </p>
             <div className="flex justify-center gap-3 mt-6">
-              <button
-                onClick={() => setTaskToDelete(null)}
-                className="px-4 py-2 text-sm text-textMuted hover:text-textMain"
-              >
+              <button onClick={() => setTaskToDelete(null)} className="px-4 py-2 text-sm text-textMuted hover:text-textMain">
                 Cancel
               </button>
               <button
@@ -457,64 +670,6 @@ export default function Tasks() {
                 Yes, Delete
               </button>
             </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Follow-Up Modal */}
-      {showFollowUpModal && selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-surface w-full max-w-md rounded-2xl border border-borderMain p-6 shadow-xl"
-          >
-            <h2 className="text-xl font-bold text-textMain mb-2">Log Follow-Up Interaction</h2>
-            <p className="text-sm text-textMuted mb-5">
-              Task: <span className="font-semibold text-textMain">{selectedTask.title}</span>
-            </p>
-            <form className="space-y-4" onSubmit={handleFollowUpSubmit}>
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1">Interaction Medium</label>
-                <select
-                  value={followUpData.followup_type}
-                  onChange={(e) => setFollowUpData({ ...followUpData, followup_type: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
-                >
-                  <option value="Call">Call</option>
-                  <option value="Email">Email</option>
-                  <option value="Meeting">Meeting</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1">Outcome & Notes *</label>
-                <textarea
-                  required
-                  value={followUpData.outcome}
-                  onChange={(e) => setFollowUpData({ ...followUpData, outcome: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-2xl p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
-                  placeholder="Key discussion points, agreed next steps..."
-                  rows={4}
-                />
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => { setShowFollowUpModal(false); setSelectedTask(null); }}
-                  className="px-4 py-2 text-sm text-textMuted hover:text-textMain"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 bg-primary-600 hover:bg-primary-500 disabled:opacity-50 text-white rounded-full text-sm font-medium transition-colors"
-                >
-                  {isSubmitting ? 'Logging...' : 'Save Follow-Up'}
-                </button>
-              </div>
-            </form>
           </motion.div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Edit2, Plus, Mail, Download, Trash2, Phone, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { Search, Edit2, Plus, Mail, Download, Trash2, Phone, Eye, ArrowRight, DollarSign, Activity, CheckCircle2, AlertCircle, X, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
 
@@ -15,12 +15,18 @@ export default function Customers() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 8;
 
+  // Customer 360 Summary Modal
+  const [summaryCustomer, setSummaryCustomer] = useState<any | null>(null);
+  const [summaryData, setSummaryData] = useState<any | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
   const [formData, setFormData] = useState({
     company_name: '',
     contact_name: '',
     email: '',
     phone: '',
     status: 'New',
+    lead_value: '',
     notes: '',
   });
   const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null);
@@ -68,17 +74,52 @@ export default function Customers() {
     }
   };
 
+  const handleAdvanceStatus = async (customer: any) => {
+    try {
+      const response = await api.post(`customers/${customer.id}/advance-status/`);
+      const updated = response.data;
+      setCustomers((prev) =>
+        prev.map((c) => (c.id === customer.id ? { ...c, status: updated.current_status } : c))
+      );
+      setAlertMsg({
+        type: 'success',
+        text: `Advanced ${customer.company_name} to ${updated.current_status}!`,
+      });
+    } catch (error) {
+      setAlertMsg({ type: 'error', text: 'Failed to advance customer stage.' });
+    }
+  };
+
+  const handleOpenSummary = async (customer: any) => {
+    setSummaryCustomer(customer);
+    setLoadingSummary(true);
+    setSummaryData(null);
+    try {
+      const response = await api.get(`customers/${customer.id}/summary/`);
+      setSummaryData(response.data);
+    } catch (error) {
+      setAlertMsg({ type: 'error', text: 'Could not load customer 360 summary.' });
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setAlertMsg(null);
 
+    const payload = {
+      ...formData,
+      lead_value: formData.lead_value ? parseFloat(formData.lead_value) : 0,
+    };
+
     try {
       if (editingCustomerId) {
-        await api.patch(`customers/${editingCustomerId}/`, formData);
+        await api.patch(`customers/${editingCustomerId}/`, payload);
         setAlertMsg({ type: 'success', text: 'Customer updated successfully.' });
       } else {
-        await api.post('customers/', formData);
+        await api.post('customers/', payload);
         setAlertMsg({ type: 'success', text: 'New customer created successfully.' });
       }
       setShowModal(false);
@@ -100,6 +141,7 @@ export default function Customers() {
       email: '',
       phone: '',
       status: 'New',
+      lead_value: '',
       notes: '',
     });
   };
@@ -111,6 +153,7 @@ export default function Customers() {
       email: customer.email || '',
       phone: customer.phone || '',
       status: customer.status || 'New',
+      lead_value: customer.lead_value !== null ? String(customer.lead_value) : '',
       notes: customer.notes || '',
     });
     setEditingCustomerId(customer.id);
@@ -175,8 +218,8 @@ export default function Customers() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-textMain tracking-tight">Customers & Accounts</h1>
-          <p className="text-sm text-textMuted mt-1">Manage accounts, lead statuses, contacts, and interaction logs.</p>
+          <h1 className="text-2xl font-bold text-textMain tracking-tight">Customers & CRM Pipeline</h1>
+          <p className="text-sm text-textMuted mt-1">Manage accounts, pipeline stages, lead values, and interaction audits.</p>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -217,7 +260,7 @@ export default function Customers() {
             onClick={() => setStatusFilter(s)}
             className={`px-3 py-1.5 rounded-full font-semibold transition-all ${
               statusFilter === s
-                ? 'bg-primary-600 text-white'
+                ? 'bg-primary-600 text-white shadow-sm'
                 : 'bg-surface border border-borderMain text-textMuted hover:text-textMain'
             }`}
           >
@@ -226,20 +269,22 @@ export default function Customers() {
         ))}
       </div>
 
-      <div className="bg-surface rounded-2xl border border-borderMain overflow-hidden flex flex-col">
+      {/* Main Customers Table */}
+      <div className="bg-surface rounded-2xl border border-borderMain overflow-hidden flex flex-col shadow-sm">
         <div className="overflow-x-auto min-h-[300px]">
           {loading ? (
-            <div className="flex justify-center items-center h-48 text-primary-500">Loading customers...</div>
+            <div className="flex justify-center items-center h-48 text-primary-500 font-medium">Loading customers...</div>
           ) : filteredCustomers.length === 0 ? (
             <div className="p-12 text-center text-textMuted">No customers match your filter.</div>
           ) : (
             <table className="w-full text-left text-sm text-textMuted">
               <thead className="bg-surfaceLighter text-textMuted uppercase text-xs font-semibold border-b border-borderMain">
                 <tr>
-                  <th className="px-6 py-4">Contact</th>
+                  <th className="px-6 py-4">Account / Contact</th>
                   <th className="px-6 py-4">Company</th>
-                  <th className="px-6 py-4">Phone</th>
-                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Lead Value</th>
+                  <th className="px-6 py-4">Pipeline Stage</th>
+                  <th className="px-6 py-4 text-center">Fast Track</th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -248,26 +293,50 @@ export default function Customers() {
                   <tr key={customer.id} className="hover:bg-surfaceLighter/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-xs font-bold text-textMain">
+                        <div className="w-9 h-9 rounded-full bg-primary-500/10 text-primary-600 border border-primary-500/20 flex items-center justify-center text-xs font-bold shrink-0">
                           {String(customer.contact_name || customer.company_name || 'C').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-medium text-textMain">{customer.contact_name}</div>
+                          <div className="font-semibold text-textMain">{customer.contact_name}</div>
                           <div className="text-xs text-textMuted">{customer.email || 'No email'}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-textMain font-medium">{customer.company_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs text-textMuted">{customer.phone || '—'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="font-semibold text-textMain">
+                        ${Number(customer.lead_value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge status={customer.status} />
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      {customer.status !== 'Closed' ? (
+                        <button
+                          onClick={() => handleAdvanceStatus(customer)}
+                          className="text-xs font-semibold px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 hover:bg-primary-600 hover:text-white transition-all inline-flex items-center gap-1 border border-primary-500/20 shadow-sm"
+                          title="Advance to next sales stage"
+                        >
+                          <span>{customer.status === 'New' ? 'Contact →' : customer.status === 'Contacted' ? 'Qualify →' : 'Close Deal 🎉'}</span>
+                        </button>
+                      ) : (
+                        <span className="text-xs font-semibold text-emerald-500">Won Deal ✓</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleOpenSummary(customer)}
+                          className="text-textMuted hover:text-primary-500 p-1.5 rounded-full hover:bg-surfaceLighter transition-colors"
+                          title="View 360 Summary & Audit Trail"
+                        >
+                          <Eye size={16} />
+                        </button>
                         {customer.email && (
                           <a
                             href={`mailto:${customer.email}`}
-                            className="text-textMuted hover:text-textMain p-1 transition-colors inline-block"
+                            className="text-textMuted hover:text-textMain p-1.5 rounded-full hover:bg-surfaceLighter transition-colors inline-block"
                             title="Draft Email"
                           >
                             <Mail size={16} />
@@ -275,14 +344,14 @@ export default function Customers() {
                         )}
                         <button
                           onClick={() => handleEditCustomer(customer)}
-                          className="text-textMuted hover:text-primary-500 p-1 transition-colors"
+                          className="text-textMuted hover:text-primary-500 p-1.5 rounded-full hover:bg-surfaceLighter transition-colors"
                           title="Edit Customer"
                         >
                           <Edit2 size={16} />
                         </button>
                         <button
                           onClick={() => setCustomerToDelete(customer)}
-                          className="text-textMuted hover:text-rose-500 p-1 transition-colors"
+                          className="text-textMuted hover:text-rose-500 p-1.5 rounded-full hover:bg-surfaceLighter transition-colors"
                           title="Delete Customer"
                         >
                           <Trash2 size={16} />
@@ -328,6 +397,95 @@ export default function Customers() {
           </div>
         )}
       </div>
+
+      {/* Customer 360 Summary Modal */}
+      {summaryCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface w-full max-w-2xl rounded-2xl border border-borderMain p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-borderMain">
+              <div>
+                <h3 className="text-xl font-bold text-textMain flex items-center gap-2">
+                  <span>{summaryCustomer.company_name}</span>
+                  <StatusBadge status={summaryCustomer.status} />
+                </h3>
+                <p className="text-xs text-textMuted mt-0.5">Primary Contact: {summaryCustomer.contact_name} {summaryCustomer.phone ? `(${summaryCustomer.phone})` : ''}</p>
+              </div>
+              <button onClick={() => setSummaryCustomer(null)} className="p-1 text-textMuted hover:text-textMain">
+                <X size={20} />
+              </button>
+            </div>
+
+            {loadingSummary ? (
+              <div className="p-12 text-center text-primary-500 font-medium">Loading account 360 summary...</div>
+            ) : summaryData ? (
+              <div className="space-y-6 pt-4">
+                {/* Metrics Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-surfaceLighter border border-borderMain p-3 rounded-xl text-center">
+                    <p className="text-xs text-textMuted">Lead Value</p>
+                    <p className="text-base font-bold text-textMain mt-1">
+                      ${Number(summaryData.stats?.total_lead_value || 0).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-surfaceLighter border border-borderMain p-3 rounded-xl text-center">
+                    <p className="text-xs text-textMuted">Total Tasks</p>
+                    <p className="text-base font-bold text-textMain mt-1">{summaryData.stats?.total_tasks || 0}</p>
+                  </div>
+                  <div className="bg-surfaceLighter border border-borderMain p-3 rounded-xl text-center">
+                    <p className="text-xs text-textMuted">Pending</p>
+                    <p className="text-base font-bold text-amber-500 mt-1">{summaryData.stats?.pending_tasks || 0}</p>
+                  </div>
+                  <div className="bg-surfaceLighter border border-borderMain p-3 rounded-xl text-center">
+                    <p className="text-xs text-textMuted">Completed</p>
+                    <p className="text-base font-bold text-emerald-500 mt-1">{summaryData.stats?.completed_tasks || 0}</p>
+                  </div>
+                </div>
+
+                {/* Audit & Activity Logs */}
+                <div>
+                  <h4 className="text-sm font-bold text-textMain mb-3 flex items-center gap-2">
+                    <Activity size={16} className="text-primary-500" /> Recent Activity & Audit Trail
+                  </h4>
+                  {summaryData.recent_activity?.length > 0 ? (
+                    <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                      {summaryData.recent_activity.map((log: any) => (
+                        <div key={log.id} className="p-3 bg-surfaceLighter border border-borderMain rounded-xl text-xs flex justify-between items-start gap-3">
+                          <div>
+                            <span className="font-semibold text-textMain">{log.action_type}</span>
+                            {log.metadata_json && (
+                              <p className="text-textMuted mt-0.5">
+                                {Object.entries(log.metadata_json).map(([k, v]) => `${k}: ${v}`).join(' | ')}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-textMuted text-[10px] shrink-0 flex items-center gap-1">
+                            <Clock size={12} /> {new Date(log.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-textMuted italic p-4 text-center bg-surfaceLighter rounded-xl">No recorded activity logs yet.</p>
+                  )}
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    onClick={() => setSummaryCustomer(null)}
+                    className="px-5 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-full text-xs font-semibold transition-colors"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </motion.div>
+        </div>
+      )}
 
       {/* Edit/Create Customer Modal */}
       {showModal && (
@@ -389,18 +547,31 @@ export default function Customers() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-textMuted mb-1">Lead/Account Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
-                >
-                  <option value="New">New</option>
-                  <option value="Contacted">Contacted</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Closed">Closed</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-textMuted mb-1">Lead/Account Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                  >
+                    <option value="New">New</option>
+                    <option value="Contacted">Contacted</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-textMuted mb-1">Lead Value ($ USD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.lead_value}
+                    onChange={(e) => setFormData({ ...formData, lead_value: e.target.value })}
+                    className="w-full bg-surfaceLighter border border-borderMain rounded-full p-2.5 text-sm text-textMain focus:border-primary-500 outline-none"
+                    placeholder="15000.00"
+                  />
+                </div>
               </div>
 
               <div>
@@ -479,7 +650,7 @@ function StatusBadge({ status }: { status: string }) {
     Closed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
   };
   return (
-    <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
+    <span className={`text-[10px] uppercase font-bold px-2.5 py-1 rounded-full inline-block border ${colors[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
       {status || 'New'}
     </span>
   );

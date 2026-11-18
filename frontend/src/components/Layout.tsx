@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Users, CheckSquare, Activity, Menu, X, Bell, Moon, Sun, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -11,27 +11,61 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const { user, logout } = useAuth();
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [openTasksCount, setOpenTasksCount] = useState<number>(0);
+  const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    const loadNotifications = async () => {
-      try {
-        const response = await api.get('notifications/');
-        setNotifications(response.data);
-      } catch (error) {
-        console.error('Failed loading notifications', error);
-      }
-    };
     loadNotifications();
+    loadTaskMetrics();
+
+    // Lightweight polling every 60s
+    const interval = setInterval(() => {
+      checkUnreadCount();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const checkUnreadCount = async () => {
+    try {
+      const res = await api.get('notifications/unread-count/');
+      if (typeof res.data?.unread_count === 'number') {
+        setUnreadCount(res.data.unread_count);
+      }
+    } catch (e) {
+      // Non-blocking
+    }
+  };
+
+  const loadNotifications = async () => {
+    try {
+      const response = await api.get('notifications/');
+      const data = response.data || [];
+      setNotifications(data);
+      setUnreadCount(data.filter((n: any) => !n.is_read).length);
+    } catch (error) {
+      console.error('Failed loading notifications', error);
+    }
+  };
+
+  const loadTaskMetrics = async () => {
+    try {
+      const response = await api.get('tasks/summary/');
+      const pending = response.data?.pending || 0;
+      const inProgress = response.data?.in_progress || 0;
+      setOpenTasksCount(pending + inProgress);
+    } catch (error) {
+      // Non-blocking fallback
+    }
+  };
 
   const markAllRead = async () => {
     try {
       await api.post('notifications/mark-all-read/');
       setNotifications((current) => current.map((n) => ({ ...n, is_read: true })));
+      setUnreadCount(0);
       setNotifOpen(false);
     } catch (error) {
       console.error('Failed to mark notifications as read', error);
@@ -41,8 +75,18 @@ export default function Layout() {
   const navItems = [
     { to: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { to: '/customers', icon: <Users size={20} />, label: 'Customers' },
-    { to: '/tasks', icon: <CheckSquare size={20} />, label: 'Tasks', badge: '3' },
-    { to: '/notifications', icon: <Bell size={20} />, label: 'Notifications' },
+    {
+      to: '/tasks',
+      icon: <CheckSquare size={20} />,
+      label: 'Tasks',
+      badge: openTasksCount > 0 ? String(openTasksCount) : undefined,
+    },
+    {
+      to: '/notifications',
+      icon: <Bell size={20} />,
+      label: 'Notifications',
+      badge: unreadCount > 0 ? String(unreadCount) : undefined,
+    },
     { to: '/timeline', icon: <Activity size={20} />, label: 'Timeline' },
   ];
 
@@ -50,14 +94,14 @@ export default function Layout() {
     <div className="h-screen bg-background flex flex-col md:flex-row relative overflow-hidden font-sans text-textMain">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar Navigation */}
-      <motion.aside 
+      <motion.aside
         initial={{ x: -280 }}
         animate={{ x: sidebarOpen || window.innerWidth >= 768 ? 0 : -280 }}
         className="fixed md:static inset-y-0 left-0 w-64 bg-surface border-r border-borderMain z-50 flex flex-col transition-transform duration-300 md:translate-x-0"
@@ -67,9 +111,7 @@ export default function Layout() {
             <div className="w-8 h-8 flex items-center justify-center rounded-full overflow-hidden border border-borderMain shadow-sm">
               <img src={edotLogo} alt="EDOT Logo" className="w-full h-full object-cover" />
             </div>
-            <span className="text-xl font-bold text-textMain tracking-tight">
-              FollowFlow
-            </span>
+            <span className="text-xl font-bold text-textMain tracking-tight">FollowFlow</span>
           </div>
           <button className="md:hidden text-textMuted hover:text-textMain" onClick={() => setSidebarOpen(false)}>
             <X size={20} />
@@ -78,13 +120,15 @@ export default function Layout() {
 
         <nav className="flex-1 px-4 py-6 space-y-1.5">
           {navItems.map((item) => (
-            <NavLink 
-              key={item.to} 
+            <NavLink
+              key={item.to}
               to={item.to}
               onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => 
+              className={({ isActive }) =>
                 `flex items-center justify-between px-3 py-2.5 rounded-full cursor-pointer transition-all duration-200 group ${
-                  isActive ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400' : 'text-textMuted hover:bg-surfaceLighter hover:text-textMain'
+                  isActive
+                    ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 font-semibold'
+                    : 'text-textMuted hover:bg-surfaceLighter hover:text-textMain'
                 }`
               }
             >
@@ -95,7 +139,7 @@ export default function Layout() {
                     {item.label}
                   </div>
                   {item.badge && (
-                    <span className="bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">
+                    <span className="bg-primary-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                       {item.badge}
                     </span>
                   )}
@@ -105,104 +149,172 @@ export default function Layout() {
           ))}
         </nav>
 
+        {/* User Card with Role Badge */}
         <div className="p-4 border-t border-borderMain">
           <NavLink
             to="/profile"
             onClick={() => setSidebarOpen(false)}
-            className="w-full text-left flex flex-col sm:flex-row items-center sm:items-start gap-3 p-3 rounded-full hover:bg-surfaceLighter transition-colors group"
+            className="w-full text-left flex items-center gap-3 p-3 rounded-2xl hover:bg-surfaceLighter transition-colors group"
             title="View Profile"
           >
-            <div className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMain text-sm font-bold shrink-0">
+            <div className="w-10 h-10 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-600 flex items-center justify-center text-sm font-bold shrink-0">
               {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
             </div>
-            <div className="flex-1 min-w-0 mt-1">
-              <p className="text-sm font-semibold text-textMain truncate">{user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username || 'Admin'}</p>
-              <p className="text-xs text-textMuted font-medium truncate group-hover:text-primary-500 transition-colors">View Profile</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-textMain truncate">
+                {user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username || 'User'}
+              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20">
+                  {user?.role || 'ADMIN'}
+                </span>
+                <span className="text-xs text-textMuted group-hover:text-primary-500 transition-colors">Profile</span>
+              </div>
             </div>
           </NavLink>
         </div>
       </motion.aside>
 
-      {/* Main Panel */}
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col z-10 min-w-0">
         <header className="shrink-0 h-16 bg-surface border-b border-borderMain flex items-center px-4 md:px-8 sticky top-0 z-30 justify-between">
-           <button className="md:hidden text-textMuted hover:text-textMain" onClick={() => setSidebarOpen(true)}>
-             <Menu size={24} />
-           </button>
+          <button className="md:hidden text-textMuted hover:text-textMain" onClick={() => setSidebarOpen(true)}>
+            <Menu size={24} />
+          </button>
 
-           <div className="hidden md:flex flex-1 mx-8 items-center gap-6">
-             <NavLink to="/" className={({ isActive }) => `text-sm font-medium ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`}>Dashboard</NavLink>
-             <NavLink to="/customers" className={({ isActive }) => `text-sm font-medium flex items-center gap-1 ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`}>Customers <span className="text-[10px]">▼</span></NavLink>
-             <NavLink to="/tasks" className={({ isActive }) => `text-sm font-medium ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`}>Tasks</NavLink>
-             <NavLink to="/notifications" className={({ isActive }) => `text-sm font-medium flex items-center gap-1 ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`}>Notifications <span className="text-[10px]">▼</span></NavLink>
-           </div>
-           
-           <div className="ml-auto flex items-center gap-5">
-              {/* Theme Toggle */}
-              <button 
-                onClick={toggleTheme}
-                className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
-                title="Toggle Theme"
+          <div className="hidden md:flex flex-1 mx-8 items-center gap-6">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `text-sm font-medium ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`
+              }
+            >
+              Dashboard
+            </NavLink>
+            <NavLink
+              to="/customers"
+              className={({ isActive }) =>
+                `text-sm font-medium ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`
+              }
+            >
+              Customers
+            </NavLink>
+            <NavLink
+              to="/tasks"
+              className={({ isActive }) =>
+                `text-sm font-medium flex items-center gap-1.5 ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`
+              }
+            >
+              Tasks
+              {openTasksCount > 0 && (
+                <span className="bg-primary-500/10 text-primary-600 dark:text-primary-400 text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-primary-500/20">
+                  {openTasksCount}
+                </span>
+              )}
+            </NavLink>
+            <NavLink
+              to="/notifications"
+              className={({ isActive }) =>
+                `text-sm font-medium flex items-center gap-1.5 ${isActive ? 'text-primary-500 border-b-2 border-primary-500 pb-5 -mb-5' : 'text-textMuted hover:text-textMain'}`
+              }
+            >
+              Notifications
+              {unreadCount > 0 && (
+                <span className="bg-rose-500/10 text-rose-500 text-[10px] font-bold px-1.5 py-0.2 rounded-full border border-rose-500/20">
+                  {unreadCount}
+                </span>
+              )}
+            </NavLink>
+          </div>
+
+          <div className="ml-auto flex items-center gap-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Notification Bell Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
+                title="Notifications"
               >
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-surface animate-pulse" />
+                )}
               </button>
 
-              {/* Notification System */}
-              <div className="relative">
-                <button 
-                  onClick={() => setNotifOpen(!notifOpen)}
-                  className="relative w-9 h-9 rounded-full bg-surfaceLighter border border-borderMain flex items-center justify-center text-textMuted hover:text-textMain transition-colors"
-                >
-                  <Bell size={18} />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-rose-500 rounded-full border border-surface animate-pulse" />
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {notifOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-80 bg-surface rounded-2xl border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
-                    >
-                      <div className="p-4 border-b border-borderMain flex justify-between items-center">
+              <AnimatePresence>
+                {notifOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-3 w-80 bg-surface rounded-2xl border border-borderMain shadow-2xl overflow-hidden z-50 text-textMain"
+                  >
+                    <div className="p-4 border-b border-borderMain flex justify-between items-center">
+                      <div className="flex items-center gap-2">
                         <h3 className="text-sm font-bold">Notifications</h3>
                         {unreadCount > 0 && (
-                          <button onClick={markAllRead} className="text-xs text-primary-500 hover:text-primary-600">
-                            Mark all read
-                          </button>
+                          <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {unreadCount} new
+                          </span>
                         )}
                       </div>
-                      <div className="max-h-64 overflow-y-auto">
-                        {notifications.length > 0 ? notifications.map(n => (
-                          <div key={n.id} className={`p-4 border-b border-borderMain text-sm ${n.is_read ? 'opacity-60' : 'bg-surfaceLighter'}`}>
-                            <p className={`font-medium ${n.title.includes('Overdue') ? 'text-rose-500' : 'text-textMain'}`}>
+                      {unreadCount > 0 && (
+                        <button onClick={markAllRead} className="text-xs text-primary-500 hover:text-primary-600 font-semibold">
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.length > 0 ? (
+                        notifications.map((n) => (
+                          <div
+                            key={n.id}
+                            className={`p-3.5 border-b border-borderMain text-xs ${n.is_read ? 'opacity-60' : 'bg-surfaceLighter'}`}
+                          >
+                            <p className={`font-semibold ${n.title.includes('Overdue') ? 'text-rose-500' : 'text-textMain'}`}>
                               {n.title}
                             </p>
+                            <p className="text-textMuted mt-0.5">{n.message}</p>
                           </div>
-                        )) : (
-                          <div className="p-6 text-center text-textMuted text-sm">No new alerts</div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                        ))
+                      ) : (
+                        <div className="p-6 text-center text-textMuted text-xs">No alerts at this time.</div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
-              <div className="hidden md:flex items-center gap-2">
-                <NavLink to="/profile" className="w-7 h-7 rounded-full bg-surfaceLighter border border-borderMain overflow-hidden flex items-center justify-center hover:border-primary-500 transition-colors" title="View Profile">
-                  <span className="text-xs font-bold text-textMain">{user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}</span>
-                </NavLink>
+            {/* Profile Avatar & Role Badge */}
+            <NavLink
+              to="/profile"
+              className="flex items-center gap-2 p-1 rounded-full hover:bg-surfaceLighter transition-colors"
+              title="View Profile"
+            >
+              <div className="w-8 h-8 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-600 flex items-center justify-center text-xs font-bold">
+                {user?.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
               </div>
-           </div>
+              <span className="hidden sm:inline-block text-xs font-bold uppercase px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20">
+                {user?.role || 'ADMIN'}
+              </span>
+            </NavLink>
+          </div>
         </header>
 
         <div className="flex-1 overflow-auto">
-           <div className="p-4 md:p-8 w-full">
-             <Outlet />
-           </div>
+          <div className="p-4 md:p-8 w-full max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
