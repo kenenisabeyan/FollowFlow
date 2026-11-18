@@ -52,11 +52,7 @@ export default function Notifications() {
 
   const markAllRead = async () => {
     try {
-      await Promise.all(
-        notifications.filter((n) => !n.is_read).map((notification) =>
-          api.patch(`notifications/${notification.id}/`, { is_read: true })
-        )
-      );
+      await api.post('notifications/mark-all-read/');
       setNotifications((current) => current.map((n) => ({ ...n, is_read: true })));
     } catch (err) {
       setError('Unable to mark all notifications as read.');

@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from customers.views import CustomerViewSet
+from customers.views import CustomerViewSet, ActivityLogViewSet
 from tasks.views import TaskViewSet, FollowUpViewSet
 from notifications.views import NotificationViewSet
 from users.views import RegisterView, UserDetailView, CustomTokenObtainPairView
@@ -15,6 +15,7 @@ router.register(r'customers', CustomerViewSet, basename='customer')
 router.register(r'tasks', TaskViewSet, basename='task')
 router.register(r'followups', FollowUpViewSet, basename='followup')
 router.register(r'notifications', NotificationViewSet, basename='notification')
+router.register(r'activity-logs', ActivityLogViewSet, basename='activity-log')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

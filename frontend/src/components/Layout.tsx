@@ -30,12 +30,8 @@ export default function Layout() {
 
   const markAllRead = async () => {
     try {
-      await Promise.all(
-        notifications.map((notification) =>
-          api.patch(`notifications/${notification.id}/`, { is_read: true })
-        )
-      );
-      setNotifications(notifications.map((n) => ({ ...n, is_read: true })));
+      await api.post('notifications/mark-all-read/');
+      setNotifications((current) => current.map((n) => ({ ...n, is_read: true })));
       setNotifOpen(false);
     } catch (error) {
       console.error('Failed to mark notifications as read', error);
