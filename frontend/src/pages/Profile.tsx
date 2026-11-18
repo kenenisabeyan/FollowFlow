@@ -5,7 +5,7 @@ import api from '../api/client';
 import { motion } from 'framer-motion';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -22,13 +22,9 @@ export default function Profile() {
     setError('');
 
     try {
-      // Backend is RetrieveUpdateAPIView at auth/me/
       const response = await api.patch('auth/me/', formData);
       setMessage('Profile updated successfully!');
-      // Update local storage or just let context refetch next time
-      const updatedUser = { ...user, ...response.data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      // Ideally we would update the context here if we exposed a setUser method
+      updateUser(response.data);
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.detail || 'Failed to update profile.');
