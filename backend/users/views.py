@@ -21,3 +21,15 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+class TeamListView(generics.ListAPIView):
+    """
+    Exposes active team members for collaborative task assignment and role management.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True).only(
+            'id', 'username', 'email', 'first_name', 'last_name', 'company_name', 'role'
+        ).order_by('username')
