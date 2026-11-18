@@ -171,6 +171,9 @@ export default function Tasks() {
     return matchesSearch && matchesStatus;
   });
 
+  const totalPages = Math.ceil(filteredTasks.length / pageSize) || 1;
+  const paginatedTasks = filteredTasks.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   return (
     <div className="space-y-6">
       {/* Toast Alert Banner */}
@@ -266,7 +269,7 @@ export default function Tasks() {
               <tbody className="divide-y divide-borderMain bg-surface">
                 {loading ? (
                     <tr><td colSpan={6} className="px-6 py-12 text-center">Loading tasks data...</td></tr>
-                ) : filteredTasks.length > 0 ? filteredTasks.map((task) => (
+                ) : paginatedTasks.length > 0 ? paginatedTasks.map((task) => (
                   <tr key={task.id} className="hover:bg-surfaceLighter/50 transition-colors group">
                     <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
