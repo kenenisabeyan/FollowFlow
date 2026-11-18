@@ -12,5 +12,11 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['user', 'created_at']),
+        ]
+
     def __str__(self):
         return f"Notification for {self.user.username}: {self.title}"

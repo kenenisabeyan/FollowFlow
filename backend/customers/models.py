@@ -14,6 +14,7 @@ class Customer(models.Model):
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='New')
+    lead_value = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
     owner = models.ForeignKey(
@@ -24,6 +25,12 @@ class Customer(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['owner', 'status']),
+            models.Index(fields=['owner', 'created_at']),
+        ]
 
     def __str__(self):
         return f"{self.contact_name} ({self.company_name})"
@@ -44,6 +51,12 @@ class ActivityLog(models.Model):
     action_type = models.CharField(max_length=100)
     metadata_json = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['customer', 'created_at']),
+            models.Index(fields=['user', 'created_at']),
+        ]
 
     def __str__(self):
         return f"{self.action_type} on {self.customer.company_name}"
