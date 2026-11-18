@@ -12,6 +12,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [warmupNotice, setWarmupNotice] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,6 +45,11 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    setWarmupNotice(false);
+
+    const timer = setTimeout(() => {
+      setWarmupNotice(true);
+    }, 3500);
 
     const payload: any = { password };
     if (email.includes('@')) {
@@ -59,7 +65,9 @@ export default function Login() {
     } catch (err: any) {
       setError(parseError(err));
     } finally {
+      clearTimeout(timer);
       setIsLoading(false);
+      setWarmupNotice(false);
     }
   };
 
@@ -96,6 +104,13 @@ export default function Login() {
               {error && (
                 <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-500">
                   {error}
+                </div>
+              )}
+
+              {isLoading && warmupNotice && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-600 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping shrink-0" />
+                  <span>Connecting to cloud backend. Free-tier servers take ~30s on cold start—please keep this tab open!</span>
                 </div>
               )}
 
