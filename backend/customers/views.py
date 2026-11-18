@@ -26,40 +26,12 @@ class CustomerViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         qs = Customer.objects.select_related('owner')
-        # If user is admin or manager, they can view all company records, else personal
         if getattr(user, 'role', 'ADMIN') in ['ADMIN', 'MANAGER'] and getattr(user, 'is_staff', False):
             return qs.order_by('-created_at')
         return qs.filter(owner=user).order_by('-created_at')
 
     def perform_create(self, serializer):
-        with transaction.atomic():
-            customer = serializer.save(owner=self.request.user)
-            ActivityLog.objects.create(
-                user=self.request.user,
-                customer=customer,
-                action_type="CUSTOMER_CREATED",
-                metadata_json={
-                    "company_name": customer.company_name,
-                    "lead_value": float(customer.lead_value or 0),
-                    "status": customer.status
-                }
-            )
-
-    def perform_update(self, serializer):
-        with transaction.atomic():
-            old_instance = self.get_object()
-            old_status = old_instance.status
-            customer = serializer.save()
-            if old_status != customer.status:
-                ActivityLog.objects.create(
-                    user=self.request.user,
-                    customer=customer,
-                    action_type="STATUS_CHANGED",
-                    metadata_json={
-                        "from_status": old_status,
-                        "to_status": customer.status
-                    }
-                )
+        serializer.save(owner=self.request.user)
 
     @action(detail=True, methods=['post'], url_path='advance-status')
     def advance_status(self, request, pk=None):
@@ -94,13 +66,6 @@ class CustomerViewSet(viewsets.ModelViewSet):
             old_status = customer.status
             customer.status = new_status
             customer.save(update_fields=['status', 'updated_at'])
-
-            ActivityLog.objects.create(
-                user=request.user,
-                customer=customer,
-                action_type="PIPELINE_ADVANCED",
-                metadata_json={"previous_status": old_status, "new_status": new_status}
-            )
 
         return Response({
             "id": customer.id,
