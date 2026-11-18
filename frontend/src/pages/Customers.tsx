@@ -12,6 +12,8 @@ export default function Customers() {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -44,7 +46,11 @@ export default function Customers() {
       );
     }
     setFilteredCustomers(result);
+    setCurrentPage(1);
   }, [searchQuery, statusFilter, customers]);
+
+  const totalPages = Math.ceil(filteredCustomers.length / pageSize) || 1;
+  const paginatedCustomers = filteredCustomers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -238,7 +244,7 @@ export default function Customers() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-borderMain">
-                {filteredCustomers.map((customer) => (
+                {paginatedCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-surfaceLighter/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
