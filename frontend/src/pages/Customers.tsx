@@ -295,6 +295,38 @@ export default function Customers() {
             </table>
           )}
         </div>
+
+        {/* Pagination Bar */}
+        {filteredCustomers.length > pageSize && (
+          <div className="p-4 border-t border-borderMain flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-textMuted bg-surfaceLighter">
+            <div>
+              Showing <span className="font-semibold text-textMain">{(currentPage - 1) * pageSize + 1}</span> to{' '}
+              <span className="font-semibold text-textMain">
+                {Math.min(currentPage * pageSize, filteredCustomers.length)}
+              </span>{' '}
+              of <span className="font-semibold text-textMain">{filteredCustomers.length}</span> accounts
+            </div>
+            <div className="flex items-center gap-1.5">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                className="px-3 py-1.5 rounded-full border border-borderMain bg-surface disabled:opacity-40 hover:bg-surfaceLighter text-textMain transition-colors"
+              >
+                Previous
+              </button>
+              <div className="px-3 py-1 font-semibold text-textMain">
+                {currentPage} / {totalPages}
+              </div>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                className="px-3 py-1.5 rounded-full border border-borderMain bg-surface disabled:opacity-40 hover:bg-surfaceLighter text-textMain transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit/Create Customer Modal */}

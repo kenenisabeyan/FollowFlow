@@ -16,6 +16,8 @@ export default function Tasks() {
   const [formData, setFormData] = useState({ title: '', description: '', customer_id: '', due_date: '', priority: 'Medium' });
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   const [showFollowUpModal, setShowFollowUpModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
